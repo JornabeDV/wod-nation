@@ -7,7 +7,9 @@ import {
   Dumbbell,
   ExternalLink,
   Copy,
+  Share2,
 } from "lucide-react";
+import { QRCodeButton } from "@/components/QRCode";
 
 export default async function CompetitionDetailPage({
   params,
@@ -80,6 +82,7 @@ export default async function CompetitionDetailPage({
               <ExternalLink size={14} />
               Open
             </Link>
+            <QRCodeButton url={publicUrl} label="QR" />
           </div>
           <div className="flex items-center gap-3">
             <input
@@ -95,6 +98,23 @@ export default async function CompetitionDetailPage({
               <ExternalLink size={14} />
               Leaderboard
             </Link>
+            <QRCodeButton url={`${publicUrl}/leaderboard`} label="QR" />
+          </div>
+          <div className="flex items-center gap-3">
+            <input
+              readOnly
+              value={`${publicUrl}/judge`}
+              className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-secondary focus:outline-none"
+            />
+            <Link
+              href={`/competitions/${competition.slug}/judge`}
+              target="_blank"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm text-text-secondary hover:text-text hover:border-border-hover transition-colors"
+            >
+              <ExternalLink size={14} />
+              Judge
+            </Link>
+            <QRCodeButton url={`${publicUrl}/judge`} label="QR" />
           </div>
         </div>
       </div>

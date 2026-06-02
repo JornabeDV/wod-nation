@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { submitScore } from "@/lib/actions";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Input } from "@/components/ui/input";
+import { toast } from "@/hooks/use-toast";
 
 export default function ScoresPage() {
   const params = useParams();
@@ -101,7 +102,20 @@ function ScoreEntryTable({ competitionId, wodId, categoryId }: { competitionId: 
       value = Number(rawScore) || 0;
     }
 
-    await submitScore({ competitionId, wodId, categoryId, athleteId, rawScore, value });
+    try {
+      await submitScore({ competitionId, wodId, categoryId, athleteId, rawScore, value });
+      toast({
+        title: "Score saved",
+        description: `Recorded ${rawScore}`,
+        variant: "success",
+      });
+    } catch (err) {
+      toast({
+        title: "Error saving score",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
   }
 
   return (

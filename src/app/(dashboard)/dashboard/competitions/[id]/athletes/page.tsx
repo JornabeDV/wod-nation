@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { createManualRegistration } from "@/lib/actions";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
+import { toast } from "@/hooks/use-toast";
 
 export default function AthletesPage() {
   const params = useParams();
@@ -17,18 +18,31 @@ export default function AthletesPage() {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     setLoading(true);
-    await createManualRegistration({
-      competitionId,
-      categoryId: form.get("categoryId") as string,
-      name: form.get("name") as string,
-      email: (form.get("email") as string) || undefined,
-      phone: (form.get("phone") as string) || undefined,
-      gender: (form.get("gender") as string) || undefined,
-      birthDate: (form.get("birthDate") as string) || undefined,
-      boxName: (form.get("boxName") as string) || undefined,
-    });
+    try {
+      await createManualRegistration({
+        competitionId,
+        categoryId: form.get("categoryId") as string,
+        name: form.get("name") as string,
+        email: (form.get("email") as string) || undefined,
+        phone: (form.get("phone") as string) || undefined,
+        gender: (form.get("gender") as string) || undefined,
+        birthDate: (form.get("birthDate") as string) || undefined,
+        boxName: (form.get("boxName") as string) || undefined,
+      });
+      toast({
+        title: "Athlete added",
+        description: `${form.get("name")} was registered successfully.`,
+        variant: "success",
+      });
+      (e.target as HTMLFormElement).reset();
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Could not register athlete. Please try again.",
+        variant: "destructive",
+      });
+    }
     setLoading(false);
-    (e.target as HTMLFormElement).reset();
   }
 
   return (
@@ -112,15 +126,56 @@ function CategorySelect({ competitionId }: { competitionId: string }) {
 function RegistrationsList({ competitionId }: { competitionId: string }) {
   const [regs, setRegs] = useState<any[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [prevPaidIds, setPrevPaidIds] = useState<Set<string>>(new Set());
 
-  if (!loaded) {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetch(`/api/competitions/${competitionId}/registrations`)
+        .then((r) => r.json())
+        .then((data: any[]) => {
+          const newlyPaid = data.filter(
+            (r) =>
+              (r.paymentStatus === "PAID" || r.paymentStatus === "FREE") &&
+              !prevPaidIds.has(r.id)
+          );
+          if (newlyPaid.length > 0 && prevPaidIds.size > 0) {
+            newlyPaid.forEach((r) => {
+              toast({
+                title: "💰 Pago confirmado",
+                description: `${r.athlete.name} — ${r.category.name}`,
+                variant: "success",
+              });
+            });
+          }
+          setPrevPaidIds(
+            new Set(
+              data
+                .filter((r) => r.paymentStatus === "PAID" || r.paymentStatus === "FREE")
+                .map((r) => r.id)
+            )
+          );
+          setRegs(data);
+          setLoaded(true);
+        });
+    }, 8000);
+
+    // Initial load
     fetch(`/api/competitions/${competitionId}/registrations`)
       .then((r) => r.json())
-      .then((data) => {
+      .then((data: any[]) => {
+        setPrevPaidIds(
+          new Set(
+            data
+              .filter((r) => r.paymentStatus === "PAID" || r.paymentStatus === "FREE")
+              .map((r) => r.id)
+          )
+        );
         setRegs(data);
         setLoaded(true);
       });
-  }
+
+    return () => clearInterval(interval);
+  }, [competitionId]);
 
   return (
     <div className="rounded-xl border border-border bg-surface-raised overflow-hidden">

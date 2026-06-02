@@ -4,7 +4,9 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import useSWR from "swr";
 import { motion, AnimatePresence } from "framer-motion";
-import { Maximize2, Minimize2, Trophy, Medal, Award, Clock } from "lucide-react";
+import { Maximize2, Minimize2, Trophy, Medal, Award, Clock, Gavel } from "lucide-react";
+import { LeaderboardExport } from "@/components/leaderboard/LeaderboardExport";
+import Link from "next/link";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -132,6 +134,18 @@ export default function LeaderboardPage() {
                 <Clock size={14} />
                 Updated {lastUpdated.toLocaleTimeString()}
               </div>
+              <LeaderboardExport
+                competitionName={competition.name}
+                categoryName={competition.categories.find((c: any) => c.id === categoryId)?.name || ""}
+                leaderboardData={leaderboard}
+              />
+              <Link
+                href={`/competitions/${slug}/judge`}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm text-text-secondary hover:text-text hover:border-border-hover transition-colors"
+              >
+                <Gavel size={14} />
+                Judge
+              </Link>
               <button
                 onClick={toggleFullscreen}
                 className="p-2 rounded-lg hover:bg-surface-raised text-text-muted hover:text-text transition-colors"
