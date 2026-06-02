@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import Link from "next/link";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
-import { DataTable } from "@/components/dashboard/DataTable";
+import { AnimatedTable } from "@/components/dashboard/AnimatedTable";
 import { PlusCircle, ArrowRight, Trophy } from "lucide-react";
 
 export default async function CompetitionsPage() {
@@ -73,7 +73,7 @@ export default async function CompetitionsPage() {
           </Link>
         </div>
       ) : (
-        <DataTable
+        <AnimatedTable
           data={competitions}
           columns={[
             {
