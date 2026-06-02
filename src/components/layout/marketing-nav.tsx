@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSession, signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 
 export function MarketingNav() {
@@ -19,8 +19,8 @@ export function MarketingNav() {
               <Link href="/dashboard">Dashboard</Link>
             </Button>
           ) : (
-            <Button size="sm" onClick={() => signIn("google")}>
-              Iniciar sesión
+            <Button asChild size="sm">
+              <Link href="/login">Iniciar sesión</Link>
             </Button>
           )}
         </nav>

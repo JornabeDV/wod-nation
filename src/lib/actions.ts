@@ -3,6 +3,7 @@
 import { db } from "./db";
 import { revalidatePath } from "next/cache";
 import { CompetitionStatus, ScoringType } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 function slugify(name: string) {
   return name
@@ -11,6 +12,36 @@ function slugify(name: string) {
     .replace(/[^\w\s-]/g, "")
     .replace(/[\s_-]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+export async function registerUser(data: {
+  name: string;
+  email: string;
+  password: string;
+}) {
+  const existing = await db.user.findUnique({
+    where: { email: data.email },
+  });
+
+  if (existing) {
+    throw new Error("El email ya está registrado");
+  }
+
+  const hashedPassword = await bcrypt.hash(data.password, 12);
+
+  const user = await db.user.create({
+    data: {
+      name: data.name,
+      email: data.email,
+      password: hashedPassword,
+    },
+  });
+
+  await db.organizerProfile.create({
+    data: { userId: user.id },
+  });
+
+  return { success: true, userId: user.id };
 }
 
 export async function createCompetition(data: {
