@@ -1,0 +1,239 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Auth.js tables ──
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  image         String?
+  role          UserRole  @default(ORGANIZER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts         Account[]
+  sessions         Session[]
+  organizerProfile OrganizerProfile?
+  athlete          Athlete?
+}
+
+enum UserRole {
+  ORGANIZER
+  ADMIN
+}
+
+// ── Application tables ──
+model OrganizerProfile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phone     String?
+  boxName   String?
+  bio       String?  @db.Text
+  website   String?
+  instagram String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  competitions Competition[]
+}
+
+model Competition {
+  id                   String            @id @default(cuid())
+  name                 String
+  slug                 String            @unique
+  description          String?           @db.Text
+  location             String?
+  bannerImage          String?
+  startDate            DateTime
+  endDate              DateTime?
+  registrationDeadline DateTime?
+  status               CompetitionStatus @default(DRAFT)
+  registrationFee      Int               @default(0)
+  currency             String            @default("ARS")
+  maxAthletes          Int?
+  organizerId          String
+  organizer            OrganizerProfile  @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  categories    Category[]
+  wods          WOD[]
+  registrations Registration[]
+  scores        Score[]
+}
+
+enum CompetitionStatus {
+  DRAFT
+  PUBLISHED
+  LIVE
+  FINISHED
+  CANCELLED
+}
+
+model Category {
+  id           String       @id @default(cuid())
+  competitionId String
+  competition   Competition  @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  name         String
+  gender       Gender?
+  divisionType DivisionType @default(CUSTOM)
+  minAge       Int?
+  maxAge       Int?
+  maxAthletes  Int?
+  order        Int          @default(0)
+
+  registrations Registration[]
+  scores        Score[]
+
+  @@unique([competitionId, name])
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  MIXED
+}
+
+enum DivisionType {
+  RX
+  SCALED
+  ELITE
+  MASTER
+  CUSTOM
+}
+
+model WOD {
+  id             String      @id @default(cuid())
+  competitionId  String
+  competition    Competition @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  name           String
+  description    String?     @db.Text
+  scoringType    ScoringType
+  timeCapMinutes Int?
+  standards      String?     @db.Text
+  order          Int         @default(0)
+  createdAt      DateTime    @default(now())
+
+  scores Score[]
+}
+
+enum ScoringType {
+  AMRAP
+  FOR_TIME
+  EMOM
+  MAX_WEIGHT
+  POINTS
+}
+
+model Athlete {
+  id        String    @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  gender    Gender?
+  birthDate DateTime?
+  boxName   String?
+  userId    String?   @unique
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt DateTime  @default(now())
+
+  registrations Registration[]
+  scores        Score[]
+
+  @@index([email])
+}
+
+model Registration {
+  id            String             @id @default(cuid())
+  competitionId String
+  competition   Competition        @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  categoryId    String
+  category      Category           @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  athleteId     String
+  athlete       Athlete            @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  status        RegistrationStatus @default(CONFIRMED)
+  paymentStatus PaymentStatus      @default(PENDING)
+  paymentId     String?
+  amountPaid    Int?
+  registeredAt  DateTime           @default(now())
+
+  @@unique([competitionId, athleteId])
+  @@index([competitionId, categoryId])
+}
+
+enum RegistrationStatus {
+  CONFIRMED
+  CANCELLED
+  WITHDRAWN
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REFUNDED
+  FREE
+}
+
+model Score {
+  id            String      @id @default(cuid())
+  competitionId String
+  competition   Competition @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  wodId         String
+  wod           WOD         @relation(fields: [wodId], references: [id], onDelete: Cascade)
+  categoryId    String
+  category      Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  athleteId     String
+  athlete       Athlete     @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  value         Float?
+  rawScore      String
+  notes         String?     @db.Text
+  judgeName     String?
+  submittedAt   DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([wodId, athleteId])
+  @@index([competitionId, categoryId, wodId])
+}
