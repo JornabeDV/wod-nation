@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { QRCodeButton } from "@/components/QRCode";
 
 export default async function PublicCompetitionPage({
   params,
@@ -41,13 +42,20 @@ export default async function PublicCompetitionPage({
         </div>
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3 items-center">
         <Button asChild>
           <Link href={`/competitions/${competition.slug}/register`}>Inscribirme</Link>
         </Button>
         <Button asChild variant="outline">
           <Link href={`/competitions/${competition.slug}/leaderboard`}>Leaderboard</Link>
         </Button>
+        <Button asChild variant="outline">
+          <Link href={`/competitions/${competition.slug}/judge`}>Modo Juez</Link>
+        </Button>
+        <QRCodeButton
+          url={`${process.env.NEXTAUTH_URL || ""}/competitions/${competition.slug}/register`}
+          label="QR Inscripción"
+        />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">

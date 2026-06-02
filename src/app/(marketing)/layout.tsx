@@ -1,4 +1,4 @@
-import { MarketingNav } from "@/components/layout/marketing-nav";
+import { Navigation } from "@/components/landing/Navigation";
 
 export default function MarketingLayout({
   children,
@@ -7,8 +7,8 @@ export default function MarketingLayout({
 }) {
   return (
     <>
-      <MarketingNav />
-      <main className="flex-1">{children}</main>
+      <Navigation />
+      <main className="relative">{children}</main>
     </>
   );
 }

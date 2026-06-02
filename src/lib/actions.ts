@@ -4,6 +4,7 @@ import { db } from "./db";
 import { revalidatePath } from "next/cache";
 import { CompetitionStatus, ScoringType } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { broadcast } from "./events";
 
 function slugify(name: string) {
   return name
@@ -214,6 +215,14 @@ export async function submitScore(data: {
 
   revalidatePath(`/dashboard/competitions/${data.competitionId}/scores`);
   revalidatePath(`/competitions/${data.competitionId}/leaderboard`);
+
+  broadcast(data.competitionId, {
+    type: "score_updated",
+    wodId: data.wodId,
+    athleteId: data.athleteId,
+    rawScore: data.rawScore,
+  });
+
   return score;
 }
 

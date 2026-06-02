@@ -3,10 +3,9 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { submitScore } from "@/lib/actions";
-import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
+import { toast } from "@/hooks/use-toast";
 
 export default function ScoresPage() {
   const params = useParams();
@@ -16,20 +15,20 @@ export default function ScoresPage() {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardContent className="p-6">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label>WOD</Label>
-              <WODSelect competitionId={competitionId} value={wodId} onChange={setWodId} />
-            </div>
-            <div className="space-y-2">
-              <Label>Categoría</Label>
-              <CategorySelect competitionId={competitionId} value={categoryId} onChange={setCategoryId} />
-            </div>
+      <PageHeader title="Score Entry" description="Enter scores by WOD and category." />
+
+      <div className="rounded-xl border border-border bg-surface-raised p-5">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="text-sm font-medium mb-2 block">WOD</label>
+            <WODSelect competitionId={competitionId} value={wodId} onChange={setWodId} />
           </div>
-        </CardContent>
-      </Card>
+          <div>
+            <label className="text-sm font-medium mb-2 block">Category</label>
+            <CategorySelect competitionId={competitionId} value={categoryId} onChange={setCategoryId} />
+          </div>
+        </div>
+      </div>
 
       {wodId && categoryId && (
         <ScoreEntryTable competitionId={competitionId} wodId={wodId} categoryId={categoryId} />
@@ -38,15 +37,7 @@ export default function ScoresPage() {
   );
 }
 
-function WODSelect({
-  competitionId,
-  value,
-  onChange,
-}: {
-  competitionId: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
+function WODSelect({ competitionId, value, onChange }: { competitionId: string; value: string; onChange: (v: string) => void }) {
   const [wods, setWods] = useState<any[]>([]);
 
   if (wods.length === 0) {
@@ -56,30 +47,16 @@ function WODSelect({
   }
 
   return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm"
-    >
-      <option value="">Seleccionar...</option>
+    <select value={value} onChange={(e) => onChange(e.target.value)} className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 py-1 text-sm">
+      <option value="">Select...</option>
       {wods.map((wod) => (
-        <option key={wod.id} value={wod.id}>
-          {wod.name}
-        </option>
+        <option key={wod.id} value={wod.id}>{wod.name}</option>
       ))}
     </select>
   );
 }
 
-function CategorySelect({
-  competitionId,
-  value,
-  onChange,
-}: {
-  competitionId: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
+function CategorySelect({ competitionId, value, onChange }: { competitionId: string; value: string; onChange: (v: string) => void }) {
   const [categories, setCategories] = useState<any[]>([]);
 
   if (categories.length === 0) {
@@ -89,30 +66,16 @@ function CategorySelect({
   }
 
   return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm"
-    >
-      <option value="">Seleccionar...</option>
+    <select value={value} onChange={(e) => onChange(e.target.value)} className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 py-1 text-sm">
+      <option value="">Select...</option>
       {categories.map((cat) => (
-        <option key={cat.id} value={cat.id}>
-          {cat.name}
-        </option>
+        <option key={cat.id} value={cat.id}>{cat.name}</option>
       ))}
     </select>
   );
 }
 
-function ScoreEntryTable({
-  competitionId,
-  wodId,
-  categoryId,
-}: {
-  competitionId: string;
-  wodId: string;
-  categoryId: string;
-}) {
+function ScoreEntryTable({ competitionId, wodId, categoryId }: { competitionId: string; wodId: string; categoryId: string }) {
   const [athletes, setAthletes] = useState<any[]>([]);
   const [scores, setScores] = useState<Record<string, string>>({});
   const [loaded, setLoaded] = useState(false);
@@ -121,8 +84,7 @@ function ScoreEntryTable({
     fetch(`/api/competitions/${competitionId}/registrations`)
       .then((r) => r.json())
       .then((regs) => {
-        const filtered = regs.filter((r: any) => r.categoryId === categoryId);
-        setAthletes(filtered);
+        setAthletes(regs.filter((r: any) => r.categoryId === categoryId));
         setLoaded(true);
       });
   }
@@ -132,7 +94,6 @@ function ScoreEntryTable({
     if (!rawScore) return;
 
     let value = 0;
-    // Simple parsing: if contains ":" treat as time in seconds
     if (rawScore.includes(":")) {
       const parts = rawScore.split(":").map(Number);
       if (parts.length === 2) value = parts[0] * 60 + parts[1];
@@ -141,54 +102,59 @@ function ScoreEntryTable({
       value = Number(rawScore) || 0;
     }
 
-    await submitScore({
-      competitionId,
-      wodId,
-      categoryId,
-      athleteId,
-      rawScore,
-      value,
-    });
+    try {
+      await submitScore({ competitionId, wodId, categoryId, athleteId, rawScore, value });
+      toast({
+        title: "Score saved",
+        description: `Recorded ${rawScore}`,
+        variant: "success",
+      });
+    } catch (err) {
+      toast({
+        title: "Error saving score",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
   }
 
   return (
-    <Card>
-      <CardContent className="p-0">
+    <div className="rounded-xl border border-border bg-surface-raised overflow-hidden">
+      <div className="overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-muted">
-            <tr>
-              <th className="px-4 py-2 text-left font-medium">Atleta</th>
-              <th className="px-4 py-2 text-left font-medium">Score</th>
-              <th className="px-4 py-2 text-left font-medium">Acción</th>
+          <thead>
+            <tr className="border-b border-border bg-surface">
+              <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase">Athlete</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase">Score</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase">Action</th>
             </tr>
           </thead>
           <tbody>
             {athletes.map((reg: any) => (
-              <tr key={reg.athleteId} className="border-t">
-                <td className="px-4 py-2">{reg.athlete.name}</td>
-                <td className="px-4 py-2">
+              <tr key={reg.athleteId} className="border-b border-border/50 hover:bg-surface-elevated/50 transition-colors">
+                <td className="px-4 py-3">{reg.athlete.name}</td>
+                <td className="px-4 py-3">
                   <Input
                     value={scores[reg.athleteId] || ""}
-                    onChange={(e) =>
-                      setScores((prev) => ({ ...prev, [reg.athleteId]: e.target.value }))
-                    }
+                    onChange={(e) => setScores((prev) => ({ ...prev, [reg.athleteId]: e.target.value }))}
                     placeholder="150 reps / 10:23"
                     className="h-8 w-40"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") saveScore(reg.athleteId);
-                    }}
+                    onKeyDown={(e) => { if (e.key === "Enter") saveScore(reg.athleteId); }}
                   />
                 </td>
-                <td className="px-4 py-2">
-                  <Button size="sm" variant="outline" onClick={() => saveScore(reg.athleteId)}>
-                    Guardar
-                  </Button>
+                <td className="px-4 py-3">
+                  <button
+                    onClick={() => saveScore(reg.athleteId)}
+                    className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text-secondary hover:text-text hover:border-border-hover transition-colors"
+                  >
+                    Save
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
