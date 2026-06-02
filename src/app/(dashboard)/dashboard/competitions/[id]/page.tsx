@@ -1,7 +1,13 @@
 import { db } from "@/lib/db";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { StatusBadge } from "@/components/dashboard/StatusBadge";
+import {
+  Users,
+  Layers,
+  Dumbbell,
+  ExternalLink,
+  Copy,
+} from "lucide-react";
 
 export default async function CompetitionDetailPage({
   params,
@@ -25,113 +31,117 @@ export default async function CompetitionDetailPage({
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Estado</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-bold">{competition.status}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Inscriptos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-bold">{competition._count.registrations}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Categorías</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-bold">{competition.categories.length}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">WODs</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-bold">{competition.wods.length}</div>
-          </CardContent>
-        </Card>
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="rounded-xl border border-border bg-surface-raised p-5">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-text-secondary">Status</span>
+            <StatusBadge status={competition.status.toLowerCase() as any} />
+          </div>
+        </div>
+        <div className="rounded-xl border border-border bg-surface-raised p-5">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-text-secondary">Athletes</span>
+            <Users size={16} className="text-text-muted" />
+          </div>
+          <div className="text-2xl font-bold">{competition._count.registrations}</div>
+        </div>
+        <div className="rounded-xl border border-border bg-surface-raised p-5">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-text-secondary">Categories</span>
+            <Layers size={16} className="text-text-muted" />
+          </div>
+          <div className="text-2xl font-bold">{competition.categories.length}</div>
+        </div>
+        <div className="rounded-xl border border-border bg-surface-raised p-5">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-text-secondary">WODs</span>
+            <Dumbbell size={16} className="text-text-muted" />
+          </div>
+          <div className="text-2xl font-bold">{competition.wods.length}</div>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Links públicos</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-center gap-2">
+      {/* Public Links */}
+      <div className="rounded-xl border border-border bg-surface-raised p-5">
+        <h3 className="text-sm font-medium mb-4">Public Links</h3>
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
             <input
               readOnly
               value={publicUrl}
-              className="flex-1 rounded-md border bg-muted px-3 py-2 text-sm"
+              className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-secondary focus:outline-none"
             />
-            <Button asChild size="sm" variant="outline">
-              <Link href={`/competitions/${competition.slug}`} target="_blank">
-                Ver
-              </Link>
-            </Button>
+            <Link
+              href={`/competitions/${competition.slug}`}
+              target="_blank"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm text-text-secondary hover:text-text hover:border-border-hover transition-colors"
+            >
+              <ExternalLink size={14} />
+              Open
+            </Link>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <input
               readOnly
               value={`${publicUrl}/leaderboard`}
-              className="flex-1 rounded-md border bg-muted px-3 py-2 text-sm"
+              className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-secondary focus:outline-none"
             />
-            <Button asChild size="sm" variant="outline">
-              <Link href={`/competitions/${competition.slug}/leaderboard`} target="_blank">
-                Ver Leaderboard
-              </Link>
-            </Button>
+            <Link
+              href={`/competitions/${competition.slug}/leaderboard`}
+              target="_blank"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm text-text-secondary hover:text-text hover:border-border-hover transition-colors"
+            >
+              <ExternalLink size={14} />
+              Leaderboard
+            </Link>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Categorías</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {competition.categories.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No hay categorías aún.</p>
-            ) : (
-              <ul className="space-y-2">
-                {competition.categories.map((cat) => (
-                  <li key={cat.id} className="flex items-center justify-between text-sm">
-                    <span>{cat.name}</span>
-                    <span className="text-xs text-muted-foreground">{cat.divisionType}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
+      {/* Two column layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="rounded-xl border border-border bg-surface-raised p-5">
+          <h3 className="text-sm font-medium mb-4">Categories</h3>
+          {competition.categories.length === 0 ? (
+            <p className="text-sm text-text-secondary">No categories yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {competition.categories.map((cat) => (
+                <div
+                  key={cat.id}
+                  className="flex items-center justify-between py-2 border-b border-border/50 last:border-0"
+                >
+                  <span className="text-sm">{cat.name}</span>
+                  <span className="text-xs text-text-muted px-2 py-0.5 rounded-full bg-surface">
+                    {cat.divisionType}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>WODs</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {competition.wods.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No hay WODs aún.</p>
-            ) : (
-              <ul className="space-y-2">
-                {competition.wods.map((wod) => (
-                  <li key={wod.id} className="flex items-center justify-between text-sm">
-                    <span>{wod.name}</span>
-                    <span className="text-xs text-muted-foreground">{wod.scoringType}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
+        <div className="rounded-xl border border-border bg-surface-raised p-5">
+          <h3 className="text-sm font-medium mb-4">WODs</h3>
+          {competition.wods.length === 0 ? (
+            <p className="text-sm text-text-secondary">No WODs yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {competition.wods.map((wod) => (
+                <div
+                  key={wod.id}
+                  className="flex items-center justify-between py-2 border-b border-border/50 last:border-0"
+                >
+                  <span className="text-sm">{wod.name}</span>
+                  <span className="text-xs text-text-muted px-2 py-0.5 rounded-full bg-surface">
+                    {wod.scoringType}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
