@@ -4,10 +4,17 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { submitScore } from "@/lib/actions";
-import { CheckCircle2, Save, Timer, Dumbbell, ChevronDown, ArrowLeft } from "lucide-react";
+import {
+  CheckCircle2,
+  Save,
+  Timer,
+  Dumbbell,
+  ChevronDown,
+  ArrowLeft,
+  Sun,
+  Moon,
+} from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function JudgeModePage() {
   const params = useParams();
@@ -16,6 +23,13 @@ export default function JudgeModePage() {
   const [wodId, setWodId] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+  useEffect(() => {
+    // Check system preference
+    const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+    setTheme(prefersLight ? "light" : "dark");
+  }, []);
 
   useEffect(() => {
     fetch(`/api/competitions/slug/${slug}`)
@@ -29,37 +43,76 @@ export default function JudgeModePage() {
 
   if (!competition) {
     return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-        <div className="animate-pulse text-white/50 text-lg">Cargando...</div>
+      <div className={`min-h-screen flex items-center justify-center ${theme === "dark" ? "bg-[#050505] text-white/50" : "bg-gray-50 text-gray-400"}`}>
+        <div className="animate-pulse text-lg">Cargando...</div>
       </div>
     );
   }
 
   const selectedWod = competition.wods.find((w: any) => w.id === wodId);
-  const selectedCategory = competition.categories.find((c: any) => c.id === categoryId);
+  const isDark = theme === "dark";
+
+  const themeClasses = {
+    page: isDark ? "bg-[#050505] text-white" : "bg-gray-50 text-gray-900",
+    header: isDark
+      ? "bg-[#050505]/90 border-white/10"
+      : "bg-white/90 border-gray-200 shadow-sm",
+    card: isDark
+      ? "border-white/10 bg-white/[0.02]"
+      : "border-gray-200 bg-white shadow-sm",
+    cardSaved: isDark
+      ? "border-emerald-500/30 bg-emerald-950/20"
+      : "border-emerald-400 bg-emerald-50",
+    input: isDark
+      ? "border-white/10 bg-white/5 text-white placeholder:text-white/20 focus:border-[#ff4d00]/50"
+      : "border-gray-200 bg-white text-gray-900 placeholder:text-gray-300 focus:border-[#ff4d00]/50",
+    select: isDark
+      ? "border-white/10 bg-white/5 text-white focus:border-[#ff4d00]/50"
+      : "border-gray-200 bg-white text-gray-900 focus:border-[#ff4d00]/50",
+    textMuted: isDark ? "text-white/50" : "text-gray-500",
+    textSecondary: isDark ? "text-white/40" : "text-gray-400",
+    button: isDark
+      ? "bg-[#ff4d00] text-white hover:bg-[#ff4d00]/90 disabled:opacity-30"
+      : "bg-[#ff4d00] text-white hover:bg-[#e04400] disabled:opacity-30",
+    buttonSaved: isDark
+      ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+      : "bg-emerald-100 text-emerald-700 border border-emerald-300",
+    label: isDark ? "text-white/40" : "text-gray-500",
+  };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white">
+    <div className={`min-h-screen ${themeClasses.page} transition-colors duration-300`}>
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-[#050505]/90 backdrop-blur-md border-b border-white/10">
+      <div className={`sticky top-0 z-10 backdrop-blur-md border-b ${themeClasses.header} transition-colors duration-300`}>
         <div className="max-w-2xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-3 mb-3">
-            <a
-              href={`/competitions/${slug}`}
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-            >
-              <ArrowLeft size={20} />
-            </a>
-            <div>
-              <h1 className="text-lg font-bold leading-tight">{competition.name}</h1>
-              <p className="text-xs text-white/50">Modo Juez</p>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <a
+                href={`/competitions/${slug}`}
+                className={`p-2 rounded-lg transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-gray-100"}`}
+              >
+                <ArrowLeft size={20} />
+              </a>
+              <div>
+                <h1 className="text-lg font-bold leading-tight">{competition.name}</h1>
+                <p className={`text-xs ${themeClasses.textMuted}`}>Modo Juez</p>
+              </div>
             </div>
+            <button
+              onClick={() => setTheme(isDark ? "light" : "dark")}
+              className={`p-2.5 rounded-xl transition-colors ${
+                isDark ? "hover:bg-white/10" : "hover:bg-gray-100"
+              }`}
+              title={isDark ? "Modo claro" : "Modo oscuro"}
+            >
+              {isDark ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
           </div>
 
           {/* WOD & Category selectors */}
           <div className="flex gap-3">
             <div className="flex-1">
-              <label className="text-[10px] uppercase tracking-wider text-white/40 font-medium mb-1 block">
+              <label className={`text-[10px] uppercase tracking-wider font-medium mb-1 block ${themeClasses.label}`}>
                 WOD
               </label>
               <div className="relative">
@@ -69,7 +122,7 @@ export default function JudgeModePage() {
                     setWodId(e.target.value);
                     setSavedIds(new Set());
                   }}
-                  className="w-full appearance-none rounded-xl border border-white/10 bg-white/5 px-4 py-3 pr-10 text-sm font-medium focus:outline-none focus:border-[#ff4d00]/50"
+                  className={`w-full appearance-none rounded-xl border px-4 py-3 pr-10 text-sm font-medium focus:outline-none transition-colors ${themeClasses.select}`}
                 >
                   {competition.wods.map((wod: any) => (
                     <option key={wod.id} value={wod.id}>
@@ -79,12 +132,12 @@ export default function JudgeModePage() {
                 </select>
                 <ChevronDown
                   size={16}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none"
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none ${themeClasses.textSecondary}`}
                 />
               </div>
             </div>
             <div className="flex-1">
-              <label className="text-[10px] uppercase tracking-wider text-white/40 font-medium mb-1 block">
+              <label className={`text-[10px] uppercase tracking-wider font-medium mb-1 block ${themeClasses.label}`}>
                 Categoría
               </label>
               <div className="relative">
@@ -94,7 +147,7 @@ export default function JudgeModePage() {
                     setCategoryId(e.target.value);
                     setSavedIds(new Set());
                   }}
-                  className="w-full appearance-none rounded-xl border border-white/10 bg-white/5 px-4 py-3 pr-10 text-sm font-medium focus:outline-none focus:border-[#ff4d00]/50"
+                  className={`w-full appearance-none rounded-xl border px-4 py-3 pr-10 text-sm font-medium focus:outline-none transition-colors ${themeClasses.select}`}
                 >
                   {competition.categories.map((cat: any) => (
                     <option key={cat.id} value={cat.id}>
@@ -104,14 +157,14 @@ export default function JudgeModePage() {
                 </select>
                 <ChevronDown
                   size={16}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none"
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none ${themeClasses.textSecondary}`}
                 />
               </div>
             </div>
           </div>
 
           {selectedWod && (
-            <div className="mt-3 flex items-center gap-4 text-xs text-white/50">
+            <div className={`mt-3 flex items-center gap-4 text-xs ${themeClasses.textMuted}`}>
               <span className="flex items-center gap-1">
                 <Dumbbell size={12} />
                 {selectedWod.scoringType}
@@ -137,6 +190,8 @@ export default function JudgeModePage() {
             categoryId={categoryId}
             savedIds={savedIds}
             setSavedIds={setSavedIds}
+            theme={theme}
+            themeClasses={themeClasses}
           />
         )}
       </div>
@@ -150,17 +205,22 @@ function JudgeScoreList({
   categoryId,
   savedIds,
   setSavedIds,
+  theme,
+  themeClasses,
 }: {
   competitionId: string;
   wodId: string;
   categoryId: string;
   savedIds: Set<string>;
   setSavedIds: React.Dispatch<React.SetStateAction<Set<string>>>;
+  theme: "dark" | "light";
+  themeClasses: Record<string, string>;
 }) {
   const [athletes, setAthletes] = useState<any[]>([]);
   const [scores, setScores] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const isDark = theme === "dark";
 
   useEffect(() => {
     setLoading(true);
@@ -169,7 +229,6 @@ function JudgeScoreList({
       .then((regs) => {
         const filtered = regs.filter((r: any) => r.categoryId === categoryId);
         setAthletes(filtered);
-        // Pre-fill existing scores if any
         const existing: Record<string, string> = {};
         filtered.forEach((reg: any) => {
           if (reg.athlete?.scores) {
@@ -218,14 +277,16 @@ function JudgeScoreList({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-pulse text-white/50">Cargando atletas...</div>
+        <div className={`animate-pulse ${isDark ? "text-white/50" : "text-gray-400"}`}>
+          Cargando atletas...
+        </div>
       </div>
     );
   }
 
   if (athletes.length === 0) {
     return (
-      <div className="text-center py-20 text-white/40">
+      <div className={`text-center py-20 ${isDark ? "text-white/40" : "text-gray-400"}`}>
         <Dumbbell size={32} className="mx-auto mb-3 opacity-50" />
         <p>No hay atletas en esta categoría.</p>
       </div>
@@ -246,21 +307,21 @@ function JudgeScoreList({
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.04 }}
               className={`rounded-2xl border p-4 transition-colors ${
-                isSaved
-                  ? "border-emerald-500/30 bg-emerald-950/20"
-                  : "border-white/10 bg-white/[0.02]"
+                isSaved ? themeClasses.cardSaved : themeClasses.card
               }`}
             >
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <div className="font-semibold text-base">{reg.athlete.name}</div>
-                  <div className="text-xs text-white/40">{reg.athlete.boxName || "—"}</div>
+                  <div className={`text-xs ${themeClasses.textSecondary}`}>
+                    {reg.athlete.boxName || "—"}
+                  </div>
                 </div>
                 {isSaved && (
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="text-emerald-400"
+                    className="text-emerald-500"
                   >
                     <CheckCircle2 size={22} />
                   </motion.div>
@@ -280,7 +341,7 @@ function JudgeScoreList({
                       ? "Editar score..."
                       : "Ej: 150 reps / 10:23"
                   }
-                  className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-lg font-mono font-semibold text-center placeholder:text-white/20 focus:outline-none focus:border-[#ff4d00]/50 focus:ring-1 focus:ring-[#ff4d00]/20 transition-all"
+                  className={`flex-1 rounded-xl border px-4 py-3 text-lg font-mono font-semibold text-center focus:outline-none focus:ring-1 transition-all ${themeClasses.input}`}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") saveScore(reg.athleteId);
                   }}
@@ -289,9 +350,7 @@ function JudgeScoreList({
                   onClick={() => saveScore(reg.athleteId)}
                   disabled={!scores[reg.athleteId] || isSaving}
                   className={`rounded-xl px-5 py-3 font-medium text-sm transition-all ${
-                    isSaved
-                      ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                      : "bg-[#ff4d00] text-white hover:bg-[#ff4d00]/90 disabled:opacity-30 disabled:cursor-not-allowed"
+                    isSaved ? themeClasses.buttonSaved : themeClasses.button
                   }`}
                 >
                   {isSaving ? (
@@ -308,7 +367,7 @@ function JudgeScoreList({
         })}
       </AnimatePresence>
 
-      <p className="text-center text-xs text-white/30 pt-4 pb-8">
+      <p className={`text-center text-xs pt-4 pb-8 ${themeClasses.textSecondary}`}>
         Presioná Enter para guardar rápidamente
       </p>
     </div>
