@@ -2,6 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { useI18n } from "@/lib/i18n/provider";
 
 const logos = [
   "CrossFit Mendoza",
@@ -15,6 +16,7 @@ const logos = [
 export function LogoStrip() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
+  const { t } = useI18n();
 
   return (
     <section className="py-16 border-y border-border">
@@ -26,7 +28,7 @@ export function LogoStrip() {
           transition={{ duration: 0.6 }}
           className="text-center text-sm text-text-muted mb-10 uppercase tracking-wider"
         >
-          Trusted by leading boxes
+          {t.logoStrip.title}
         </motion.p>
         <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
           {logos.map((name, i) => (

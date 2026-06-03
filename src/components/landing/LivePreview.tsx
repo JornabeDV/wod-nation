@@ -2,6 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { useI18n } from "@/lib/i18n/provider";
 
 const leaderboardData = [
   { rank: 1, name: "Martín García", box: "CrossFit Centro", wod1: "2:45", wod2: "18 rds", wod3: "115 kg", total: 3 },
@@ -12,6 +13,7 @@ const leaderboardData = [
 export function LivePreview() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const { t } = useI18n();
 
   return (
     <section className="py-24 sm:py-32 relative overflow-hidden">
@@ -24,12 +26,14 @@ export function LivePreview() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Live rankings that{" "}
-            <span className="text-gradient-primary">feel alive</span>
+            {t.livePreview.title.split("<gradient>")[0]}
+            <span className="text-gradient-primary">
+              {t.livePreview.title.split("<gradient>")[1].split("</gradient>")[0]}
+            </span>
+            {t.livePreview.title.split("</gradient>")[1]}
           </h2>
           <p className="text-text-secondary max-w-2xl mx-auto">
-            No more Excel headaches. Your leaderboard updates automatically as
-            judges enter scores. Athletes and spectators see results in real time.
+            {t.livePreview.subtitle}
           </p>
         </motion.div>
 
@@ -51,14 +55,14 @@ export function LivePreview() {
                 <div className="h-2 w-2 rounded-full bg-green-500" />
               </div>
               <div className="text-sm font-medium text-text-secondary">
-                Box Battle 2026 — RX Masculino
+                {t.livePreview.header}
               </div>
               <div className="flex items-center gap-2">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
                 </span>
-                <span className="text-xs text-text-muted">LIVE</span>
+                <span className="text-xs text-text-muted">{t.livePreview.live}</span>
               </div>
             </div>
 
@@ -67,13 +71,13 @@ export function LivePreview() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border text-left text-text-muted">
-                    <th className="px-6 py-3 font-medium">#</th>
-                    <th className="px-6 py-3 font-medium">Athlete</th>
-                    <th className="px-6 py-3 font-medium">Box</th>
-                    <th className="px-6 py-3 font-medium text-center">WOD 1</th>
-                    <th className="px-6 py-3 font-medium text-center">WOD 2</th>
-                    <th className="px-6 py-3 font-medium text-center">WOD 3</th>
-                    <th className="px-6 py-3 font-medium text-center">Total</th>
+                    <th className="px-6 py-3 font-medium">{t.livePreview.table.rank}</th>
+                    <th className="px-6 py-3 font-medium">{t.livePreview.table.athlete}</th>
+                    <th className="px-6 py-3 font-medium">{t.livePreview.table.box}</th>
+                    <th className="px-6 py-3 font-medium text-center">{t.livePreview.table.wod1}</th>
+                    <th className="px-6 py-3 font-medium text-center">{t.livePreview.table.wod2}</th>
+                    <th className="px-6 py-3 font-medium text-center">{t.livePreview.table.wod3}</th>
+                    <th className="px-6 py-3 font-medium text-center">{t.livePreview.table.total}</th>
                   </tr>
                 </thead>
                 <tbody>

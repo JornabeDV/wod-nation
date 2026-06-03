@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Play } from "lucide-react";
+import { useI18n } from "@/lib/i18n/provider";
 
 function FloatingOrb({
   className,
@@ -30,7 +31,11 @@ function FloatingOrb({
 }
 
 export function Hero() {
-  const words = "Run competitions like a pro.".split(" ");
+  const { t } = useI18n();
+  const headline = t.hero.headline;
+  const words = headline.split(" ");
+  const normalWords = words.slice(0, -1);
+  const lastWord = words[words.length - 1];
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
@@ -70,13 +75,13 @@ export function Hero() {
             <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
           </span>
           <span className="text-sm text-text-secondary">
-            Now live — Box Battle 2026
+            {t.hero.badge}
           </span>
         </motion.div>
 
         {/* Headline */}
         <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
-          {words.map((word, i) => (
+          {normalWords.map((word, i) => (
             <motion.span
               key={i}
               className="inline-block mr-[0.25em]"
@@ -88,13 +93,21 @@ export function Hero() {
                 ease: [0.22, 1, 0.36, 1],
               }}
             >
-              {word === "pro." ? (
-                <span className="text-gradient-primary">{word}</span>
-              ) : (
-                word
-              )}
+              {word}
             </motion.span>
           ))}
+          <motion.span
+            className="inline-block text-gradient-primary"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.5,
+              delay: 0.3 + normalWords.length * 0.08,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+          >
+            {lastWord}
+          </motion.span>
         </h1>
 
         {/* Subheadline */}
@@ -104,9 +117,7 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto max-w-2xl text-lg sm:text-xl text-text-secondary mb-10"
         >
-          The all-in-one platform for CrossFit and functional fitness
-          competitions. Create events, collect payments, track scores, and
-          display live leaderboards — all in one place.
+          {t.hero.subheadline}
         </motion.p>
 
         {/* CTAs */}
@@ -120,7 +131,7 @@ export function Hero() {
             href="/register"
             className="group relative inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-semibold text-white transition-all hover:bg-primary-glow glow-primary"
           >
-            Start for free
+            {t.hero.ctaPrimary}
             <ArrowRight
               size={18}
               className="transition-transform group-hover:translate-x-1"
@@ -131,7 +142,7 @@ export function Hero() {
             className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface-raised px-8 py-4 text-base font-medium text-text-secondary transition-all hover:border-border-hover hover:text-text"
           >
             <Play size={18} className="text-primary" />
-            View live demo
+            {t.hero.ctaSecondary}
           </Link>
         </motion.div>
 
@@ -152,10 +163,7 @@ export function Hero() {
               </div>
             ))}
           </div>
-          <span>
-            Trusted by <strong className="text-text">50+ boxes</strong> across
-            Latin America
-          </span>
+          <span dangerouslySetInnerHTML={{ __html: t.hero.socialProof }} />
         </motion.div>
       </div>
 

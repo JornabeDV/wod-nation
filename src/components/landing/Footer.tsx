@@ -1,27 +1,30 @@
 "use client";
 
 import Link from "next/link";
-
-const footerLinks = {
-  Product: [
-    { label: "Features", href: "#features" },
-    { label: "Pricing", href: "#pricing" },
-    { label: "Changelog", href: "#" },
-  ],
-  Resources: [
-    { label: "Documentation", href: "#" },
-    { label: "Help Center", href: "#" },
-    { label: "Blog", href: "#" },
-  ],
-  Company: [
-    { label: "About", href: "#" },
-    { label: "Contact", href: "#" },
-    { label: "Privacy", href: "#" },
-    { label: "Terms", href: "#" },
-  ],
-};
+import { useI18n } from "@/lib/i18n/provider";
 
 export function Footer() {
+  const { t } = useI18n();
+
+  const footerLinks = {
+    [t.footer.links.product.title]: [
+      { label: t.footer.links.product.features, href: "#features" },
+      { label: t.footer.links.product.pricing, href: "#pricing" },
+      { label: t.footer.links.product.changelog, href: "#" },
+    ],
+    [t.footer.links.resources.title]: [
+      { label: t.footer.links.resources.documentation, href: "#" },
+      { label: t.footer.links.resources.helpCenter, href: "#" },
+      { label: t.footer.links.resources.blog, href: "#" },
+    ],
+    [t.footer.links.company.title]: [
+      { label: t.footer.links.company.about, href: "#" },
+      { label: t.footer.links.company.contact, href: "#" },
+      { label: t.footer.links.company.privacy, href: "#" },
+      { label: t.footer.links.company.terms, href: "#" },
+    ],
+  };
+
   return (
     <footer className="border-t border-border bg-surface">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
@@ -34,7 +37,7 @@ export function Footer() {
               <span className="text-lg font-semibold">WODNation</span>
             </Link>
             <p className="text-sm text-text-secondary leading-relaxed">
-              The future of fitness competitions. Built for organizers who care.
+              {t.footer.description}
             </p>
           </div>
 
@@ -59,7 +62,7 @@ export function Footer() {
 
         <div className="mt-16 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-text-muted">
-            © {new Date().getFullYear()} WODNation. All rights reserved.
+            {t.footer.copyright.replace("{year}", String(new Date().getFullYear()))}
           </p>
           <div className="flex items-center gap-6">
             <a

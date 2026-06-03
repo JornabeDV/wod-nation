@@ -4,10 +4,12 @@ import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { useI18n } from "@/lib/i18n/provider";
 
 export function CTA() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const { t } = useI18n();
 
   return (
     <section className="py-24 sm:py-32 relative overflow-hidden">
@@ -21,18 +23,20 @@ export function CTA() {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-3xl sm:text-5xl font-bold tracking-tight mb-6">
-            Ready to run your{" "}
-            <span className="text-gradient-primary">next competition?</span>
+            {t.cta.title.split("<gradient>")[0]}
+            <span className="text-gradient-primary">
+              {t.cta.title.split("<gradient>")[1].split("</gradient>")[0]}
+            </span>
+            {t.cta.title.split("</gradient>")[1]}
           </h2>
           <p className="text-text-secondary text-lg mb-10 max-w-2xl mx-auto">
-            Join 50+ boxes already using WODNation to run better competitions.
-            Start free, upgrade when you need to.
+            {t.cta.subtitle}
           </p>
           <Link
             href="/register"
             className="group inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-semibold text-white transition-all hover:bg-primary-glow glow-primary"
           >
-            Create your first competition
+            {t.cta.button}
             <ArrowRight
               size={18}
               className="transition-transform group-hover:translate-x-1"
