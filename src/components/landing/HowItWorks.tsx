@@ -2,31 +2,18 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-
-const steps = [
-  {
-    number: "01",
-    title: "Create your competition",
-    description:
-      "Set up your event in minutes. Define categories, WODs, scoring rules, and registration fees.",
-  },
-  {
-    number: "02",
-    title: "Athletes register & pay",
-    description:
-      "Share one link. Athletes sign up and pay online. No more chasing payments or managing spreadsheets.",
-  },
-  {
-    number: "03",
-    title: "Score & broadcast live",
-    description:
-      "Judges enter scores from any device. The leaderboard updates instantly for athletes and spectators.",
-  },
-];
+import { useI18n } from "@/lib/i18n/provider";
 
 export function HowItWorks() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const { t } = useI18n();
+
+  const steps = [
+    t.howItWorks.steps.create,
+    t.howItWorks.steps.register,
+    t.howItWorks.steps.score,
+  ];
 
   return (
     <section id="how-it-works" className="py-24 sm:py-32 bg-surface">
@@ -39,12 +26,14 @@ export function HowItWorks() {
           className="text-center mb-20"
         >
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            From idea to competition in{" "}
-            <span className="text-gradient-primary">3 steps</span>
+            {t.howItWorks.title.split("<gradient>")[0]}
+            <span className="text-gradient-primary">
+              {t.howItWorks.title.split("<gradient>")[1].split("</gradient>")[0]}
+            </span>
+            {t.howItWorks.title.split("</gradient>")[1]}
           </h2>
           <p className="text-text-secondary max-w-2xl mx-auto">
-            We stripped away the complexity so you can focus on what matters:
-            running an epic event.
+            {t.howItWorks.subtitle}
           </p>
         </motion.div>
 

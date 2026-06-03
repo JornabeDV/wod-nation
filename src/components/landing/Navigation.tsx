@@ -5,23 +5,26 @@ import { useSession } from "next-auth/react";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-
-const navLinks = [
-  { href: "#features", label: "Features" },
-  { href: "#how-it-works", label: "How it works" },
-  { href: "#pricing", label: "Pricing" },
-  { href: "#faq", label: "FAQ" },
-];
+import { useI18n } from "@/lib/i18n/provider";
+import { LanguageSwitcher } from "@/components/ui/language/LanguageSwitcher";
 
 export function Navigation() {
   const { data: session } = useSession();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { scrollY } = useScroll();
+  const { t } = useI18n();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setScrolled(latest > 20);
   });
+
+  const navLinks = [
+    { href: "#features", label: t.nav.features },
+    { href: "#how-it-works", label: t.nav.howItWorks },
+    { href: "#pricing", label: t.nav.pricing },
+    { href: "#faq", label: t.nav.faq },
+  ];
 
   return (
     <motion.header
@@ -57,12 +60,13 @@ export function Navigation() {
           </div>
 
           <div className="hidden md:flex items-center gap-4">
+            <LanguageSwitcher />
             {session ? (
               <Link
                 href="/dashboard"
                 className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-glow transition-colors"
               >
-                Dashboard
+                {t.nav.dashboard}
               </Link>
             ) : (
               <>
@@ -70,13 +74,13 @@ export function Navigation() {
                   href="/login"
                   className="text-sm text-text-secondary hover:text-text transition-colors"
                 >
-                  Sign in
+                  {t.nav.signIn}
                 </Link>
                 <Link
                   href="/register"
                   className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-glow transition-colors"
                 >
-                  Get Started
+                  {t.nav.getStarted}
                 </Link>
               </>
             )}
@@ -111,19 +115,23 @@ export function Navigation() {
               </Link>
             ))}
             <div className="pt-3 border-t border-border flex flex-col gap-2">
+              <div className="flex items-center justify-between py-2">
+                <span className="text-sm text-text-secondary">{t.language.label}</span>
+                <LanguageSwitcher />
+              </div>
               <Link
                 href="/login"
                 className="block text-center text-sm text-text-secondary py-2"
                 onClick={() => setMobileOpen(false)}
               >
-                Sign in
+                {t.nav.signIn}
               </Link>
               <Link
                 href="/register"
                 className="block text-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white"
                 onClick={() => setMobileOpen(false)}
               >
-                Get Started
+                {t.nav.getStarted}
               </Link>
             </div>
           </div>

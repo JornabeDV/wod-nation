@@ -3,34 +3,7 @@
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
-
-const faqs = [
-  {
-    question: "Do I need a credit card to start?",
-    answer:
-      "No. You can create your first competition and test the platform completely free. We only charge when you're ready to publish and collect payments.",
-  },
-  {
-    question: "Can athletes pay with MercadoPago?",
-    answer:
-      "Yes. We integrate with MercadoPago so athletes can pay with credit card, debit card, or MercadoPago balance during registration.",
-  },
-  {
-    question: "Does the leaderboard work on mobile?",
-    answer:
-      "Absolutely. The leaderboard is fully responsive and works great on phones, tablets, and TVs. Athletes can check their ranking from anywhere.",
-  },
-  {
-    question: "Can I export results after the competition?",
-    answer:
-      "Yes. You can export full results to CSV or PDF at any time. We also keep a historical record of all your competitions.",
-  },
-  {
-    question: "What types of WOD scoring do you support?",
-    answer:
-      "AMRAP, For Time, EMOM, Max Weight, and Points-based scoring. We're adding more formats based on organizer feedback.",
-  },
-];
+import { useI18n } from "@/lib/i18n/provider";
 
 function FAQItem({
   question,
@@ -76,6 +49,15 @@ function FAQItem({
 export function FAQ() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const { t } = useI18n();
+
+  const faqs = [
+    t.faq.items.creditcard,
+    t.faq.items.mercadopago,
+    t.faq.items.mobile,
+    t.faq.items.export,
+    t.faq.items.scoring,
+  ];
 
   return (
     <section id="faq" className="py-24 sm:py-32">
@@ -88,8 +70,11 @@ export function FAQ() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Frequently asked{" "}
-            <span className="text-gradient-primary">questions</span>
+            {t.faq.title.split("<gradient>")[0]}
+            <span className="text-gradient-primary">
+              {t.faq.title.split("<gradient>")[1].split("</gradient>")[0]}
+            </span>
+            {t.faq.title.split("</gradient>")[1]}
           </h2>
         </motion.div>
 
