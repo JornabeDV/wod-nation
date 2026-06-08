@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/provider";
 
 const variants = {
   draft: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
@@ -13,13 +14,19 @@ const variants = {
   free: "bg-text-muted/10 text-text-muted border-text-muted/20",
 };
 
+export type StatusBadgeKey = keyof typeof variants;
+
 export function StatusBadge({
   status,
   className,
 }: {
-  status: keyof typeof variants;
+  status: StatusBadgeKey;
   className?: string;
 }) {
+  const { t } = useI18n();
+
+  const label = t.dashboard.status[status] ?? status;
+
   return (
     <span
       className={cn(
@@ -28,7 +35,7 @@ export function StatusBadge({
         className
       )}
     >
-      {status}
+      {label}
     </span>
   );
 }

@@ -57,6 +57,8 @@ model User {
   sessions         Session[]
   organizerProfile OrganizerProfile?
   athlete          Athlete?
+  resetToken       String?   @unique
+  resetTokenExpires DateTime?
 }
 
 enum UserRole {
