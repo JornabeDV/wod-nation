@@ -6,11 +6,16 @@ import { createWOD, deleteWOD } from "@/lib/actions";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useI18n } from "@/lib/i18n/provider";
 
 export default function WODsPage() {
   const params = useParams();
   const competitionId = params.id as string;
   const [loading, setLoading] = useState(false);
+  const { t } = useI18n();
+  const d = t.dashboard.wodsPage;
+  const common = t.dashboard.common;
+  const scoringTypes = t.dashboard.newCompetition.wods.scoringTypes;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -30,36 +35,36 @@ export default function WODsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="WODs" description="Define workouts and scoring rules." />
+      <PageHeader title={d.title} description={d.description} />
 
       <div className="rounded-xl border border-border bg-surface-raised p-5">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name *</Label>
-              <Input id="name" name="name" placeholder="WOD 1" required />
+              <Label htmlFor="name">{d.name}</Label>
+              <Input id="name" name="name" placeholder={d.namePlaceholder} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="scoringType">Scoring Type *</Label>
+              <Label htmlFor="scoringType">{d.scoringType}</Label>
               <select id="scoringType" name="scoringType" required className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 py-1 text-sm">
-                <option value="AMRAP">AMRAP (reps)</option>
-                <option value="FOR_TIME">For Time</option>
-                <option value="EMOM">EMOM (rounds)</option>
-                <option value="MAX_WEIGHT">Max Weight</option>
-                <option value="POINTS">Points</option>
+                <option value="AMRAP">{scoringTypes.amrap}</option>
+                <option value="FOR_TIME">{scoringTypes.forTime}</option>
+                <option value="EMOM">{scoringTypes.emom}</option>
+                <option value="MAX_WEIGHT">{scoringTypes.maxWeight}</option>
+                <option value="POINTS">{scoringTypes.points}</option>
               </select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="timeCapMinutes">Time Cap (min)</Label>
+              <Label htmlFor="timeCapMinutes">{d.timeCap}</Label>
               <Input id="timeCapMinutes" name="timeCapMinutes" type="number" min="1" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">{d.description}</Label>
               <Input id="description" name="description" />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="standards">Standards</Label>
+            <Label htmlFor="standards">{d.standards}</Label>
             <textarea id="standards" name="standards" rows={3} className="flex w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm" />
           </div>
           <div className="flex justify-end">
@@ -68,7 +73,7 @@ export default function WODsPage() {
               disabled={loading}
               className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-glow transition-colors disabled:opacity-50"
             >
-              {loading ? "Adding..." : "Add WOD"}
+              {loading ? d.adding : d.add}
             </button>
           </div>
         </form>
@@ -82,6 +87,9 @@ export default function WODsPage() {
 function WODsList({ competitionId }: { competitionId: string }) {
   const [wods, setWods] = useState<any[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const { t } = useI18n();
+  const d = t.dashboard.wodsPage;
+  const timeCapSuffix = t.dashboard.newCompetition.wods.timeCapSuffix;
 
   if (!loaded) {
     fetch(`/api/competitions/${competitionId}/wods`)
@@ -95,9 +103,9 @@ function WODsList({ competitionId }: { competitionId: string }) {
   return (
     <div className="space-y-3">
       {!loaded ? (
-        <p className="text-sm text-text-secondary">Loading...</p>
+        <p className="text-sm text-text-secondary">{t.dashboard.common.loading}</p>
       ) : wods.length === 0 ? (
-        <p className="text-sm text-text-secondary">No WODs yet.</p>
+        <p className="text-sm text-text-secondary">{d.empty}</p>
       ) : (
         wods.map((wod) => (
           <div
@@ -106,13 +114,13 @@ function WODsList({ competitionId }: { competitionId: string }) {
           >
             <div>
               <p className="font-medium">{wod.name}</p>
-              <p className="text-xs text-text-muted">{wod.scoringType}{wod.timeCapMinutes ? ` · ${wod.timeCapMinutes}min cap` : ""}</p>
+              <p className="text-xs text-text-muted">{wod.scoringType}{wod.timeCapMinutes ? ` · ${wod.timeCapMinutes}${timeCapSuffix}` : ""}</p>
             </div>
             <button
               onClick={() => deleteWOD(wod.id, competitionId).then(() => setLoaded(false))}
               className="text-sm text-red-400 hover:text-red-300 transition-colors"
             >
-              Delete
+              {t.dashboard.common.delete}
             </button>
           </div>
         ))

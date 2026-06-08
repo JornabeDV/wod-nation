@@ -6,11 +6,14 @@ import { createCategory, deleteCategory } from "@/lib/actions";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useI18n } from "@/lib/i18n/provider";
 
 export default function CategoriesPage() {
   const params = useParams();
   const competitionId = params.id as string;
   const [loading, setLoading] = useState(false);
+  const { t } = useI18n();
+  const d = t.dashboard.categoriesPage;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -31,36 +34,36 @@ export default function CategoriesPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Categories" description="Define divisions for your competition." />
+      <PageHeader title={d.title} description={d.description} />
 
       <div className="rounded-xl border border-border bg-surface-raised p-5">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name *</Label>
-              <Input id="name" name="name" placeholder="RX Masculino" required />
+              <Label htmlFor="name">{d.name}</Label>
+              <Input id="name" name="name" placeholder={d.namePlaceholder} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="gender">Gender</Label>
+              <Label htmlFor="gender">{d.gender}</Label>
               <select id="gender" name="gender" className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 py-1 text-sm">
                 <option value="">—</option>
-                <option value="MALE">Masculino</option>
-                <option value="FEMALE">Femenino</option>
-                <option value="MIXED">Mixto</option>
+                <option value="MALE">{t.dashboard.newCompetition.categories.gender.male}</option>
+                <option value="FEMALE">{t.dashboard.newCompetition.categories.gender.female}</option>
+                <option value="MIXED">{t.dashboard.newCompetition.categories.gender.mixed}</option>
               </select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="divisionType">División</Label>
+              <Label htmlFor="divisionType">{d.division}</Label>
               <select id="divisionType" name="divisionType" className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 py-1 text-sm">
-                <option value="CUSTOM">Custom</option>
-                <option value="RX">RX</option>
-                <option value="SCALED">Scaled</option>
-                <option value="ELITE">Elite</option>
-                <option value="MASTER">Master</option>
+                <option value="CUSTOM">{t.dashboard.newCompetition.categories.division.custom}</option>
+                <option value="RX">{t.dashboard.newCompetition.categories.division.rx}</option>
+                <option value="SCALED">{t.dashboard.newCompetition.categories.division.scaled}</option>
+                <option value="ELITE">{t.dashboard.newCompetition.categories.division.elite}</option>
+                <option value="MASTER">{t.dashboard.newCompetition.categories.division.master}</option>
               </select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="maxAthletes">Cupo</Label>
+              <Label htmlFor="maxAthletes">{d.maxAthletes}</Label>
               <Input id="maxAthletes" name="maxAthletes" type="number" min="1" />
             </div>
           </div>
@@ -70,7 +73,7 @@ export default function CategoriesPage() {
               disabled={loading}
               className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-glow transition-colors disabled:opacity-50"
             >
-              {loading ? "Adding..." : "Add Category"}
+              {loading ? d.adding : d.add}
             </button>
           </div>
         </form>
@@ -84,6 +87,8 @@ export default function CategoriesPage() {
 function CategoriesList({ competitionId }: { competitionId: string }) {
   const [categories, setCategories] = useState<any[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const { t } = useI18n();
+  const d = t.dashboard.categoriesPage;
 
   if (!loaded) {
     fetch(`/api/competitions/${competitionId}/categories`)
@@ -97,9 +102,9 @@ function CategoriesList({ competitionId }: { competitionId: string }) {
   return (
     <div className="space-y-3">
       {!loaded ? (
-        <p className="text-sm text-text-secondary">Loading...</p>
+        <p className="text-sm text-text-secondary">{t.dashboard.common.loading}</p>
       ) : categories.length === 0 ? (
-        <p className="text-sm text-text-secondary">No categories yet.</p>
+        <p className="text-sm text-text-secondary">{d.empty}</p>
       ) : (
         categories.map((cat) => (
           <div
@@ -114,7 +119,7 @@ function CategoriesList({ competitionId }: { competitionId: string }) {
               onClick={() => deleteCategory(cat.id, competitionId).then(() => setLoaded(false))}
               className="text-sm text-red-400 hover:text-red-300 transition-colors"
             >
-              Delete
+              {t.dashboard.common.delete}
             </button>
           </div>
         ))

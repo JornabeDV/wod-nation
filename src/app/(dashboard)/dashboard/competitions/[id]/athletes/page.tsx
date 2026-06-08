@@ -8,21 +8,25 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { toast } from "@/hooks/use-toast";
+import { useI18n } from "@/lib/i18n/provider";
 
 export default function AthletesPage() {
   const params = useParams();
   const competitionId = params.id as string;
   const [loading, setLoading] = useState(false);
+  const { t } = useI18n();
+  const d = t.dashboard.athletesPage;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
+    const athleteName = form.get("name") as string;
     setLoading(true);
     try {
       await createManualRegistration({
         competitionId,
         categoryId: form.get("categoryId") as string,
-        name: form.get("name") as string,
+        name: athleteName,
         email: (form.get("email") as string) || undefined,
         phone: (form.get("phone") as string) || undefined,
         gender: (form.get("gender") as string) || undefined,
@@ -30,15 +34,15 @@ export default function AthletesPage() {
         boxName: (form.get("boxName") as string) || undefined,
       });
       toast({
-        title: "Athlete added",
-        description: `${form.get("name")} was registered successfully.`,
+        title: d.toast.addedTitle,
+        description: d.toast.addedDescription.replace("{name}", athleteName),
         variant: "success",
       });
       (e.target as HTMLFormElement).reset();
     } catch (err) {
       toast({
-        title: "Error",
-        description: "Could not register athlete. Please try again.",
+        title: d.toast.errorTitle,
+        description: d.toast.errorDescription,
         variant: "destructive",
       });
     }
@@ -47,43 +51,43 @@ export default function AthletesPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Athletes" description="Manage registrations and walk-ins." />
+      <PageHeader title={d.title} description={d.description} />
 
       <div className="rounded-xl border border-border bg-surface-raised p-5">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name *</Label>
+              <Label htmlFor="name">{d.name}</Label>
               <Input id="name" name="name" required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{d.email}</Label>
               <Input id="email" name="email" type="email" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">{d.phone}</Label>
               <Input id="phone" name="phone" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="gender">Gender</Label>
+              <Label htmlFor="gender">{d.gender}</Label>
               <select id="gender" name="gender" className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 py-1 text-sm">
                 <option value="">—</option>
-                <option value="MALE">Masculino</option>
-                <option value="FEMALE">Femenino</option>
+                <option value="MALE">{t.dashboard.newCompetition.categories.gender.male}</option>
+                <option value="FEMALE">{t.dashboard.newCompetition.categories.gender.female}</option>
               </select>
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
-              <Label htmlFor="categoryId">Category *</Label>
+              <Label htmlFor="categoryId">{d.category}</Label>
               <CategorySelect competitionId={competitionId} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="boxName">Box / Affiliate</Label>
+              <Label htmlFor="boxName">{d.boxName}</Label>
               <Input id="boxName" name="boxName" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="birthDate">Birth Date</Label>
+              <Label htmlFor="birthDate">{d.birthDate}</Label>
               <Input id="birthDate" name="birthDate" type="date" />
             </div>
           </div>
@@ -93,7 +97,7 @@ export default function AthletesPage() {
               disabled={loading}
               className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-glow transition-colors disabled:opacity-50"
             >
-              {loading ? "Adding..." : "Add Athlete"}
+              {loading ? d.adding : d.add}
             </button>
           </div>
         </form>
@@ -106,6 +110,7 @@ export default function AthletesPage() {
 
 function CategorySelect({ competitionId }: { competitionId: string }) {
   const [categories, setCategories] = useState<any[]>([]);
+  const { t } = useI18n();
 
   if (categories.length === 0) {
     fetch(`/api/competitions/${competitionId}/categories`)
@@ -115,7 +120,7 @@ function CategorySelect({ competitionId }: { competitionId: string }) {
 
   return (
     <select id="categoryId" name="categoryId" required className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 py-1 text-sm">
-      <option value="">Select...</option>
+      <option value="">{t.dashboard.common.select}</option>
       {categories.map((cat: any) => (
         <option key={cat.id} value={cat.id}>{cat.name}</option>
       ))}
@@ -127,6 +132,8 @@ function RegistrationsList({ competitionId }: { competitionId: string }) {
   const [regs, setRegs] = useState<any[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [prevPaidIds, setPrevPaidIds] = useState<Set<string>>(new Set());
+  const { t } = useI18n();
+  const d = t.dashboard.athletesPage;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -159,7 +166,6 @@ function RegistrationsList({ competitionId }: { competitionId: string }) {
         });
     }, 8000);
 
-    // Initial load
     fetch(`/api/competitions/${competitionId}/registrations`)
       .then((r) => r.json())
       .then((data: any[]) => {
@@ -180,17 +186,17 @@ function RegistrationsList({ competitionId }: { competitionId: string }) {
   return (
     <div className="rounded-xl border border-border bg-surface-raised overflow-hidden">
       {!loaded ? (
-        <div className="p-8 text-center text-sm text-text-secondary">Loading...</div>
+        <div className="p-8 text-center text-sm text-text-secondary">{t.dashboard.common.loading}</div>
       ) : regs.length === 0 ? (
-        <div className="p-8 text-center text-sm text-text-secondary">No athletes registered yet.</div>
+        <div className="p-8 text-center text-sm text-text-secondary">{d.table.empty}</div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-surface">
-                <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase">Name</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase">Category</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase">Payment</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase">{d.table.name}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase">{d.table.category}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase">{d.table.payment}</th>
               </tr>
             </thead>
             <tbody>
