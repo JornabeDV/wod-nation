@@ -331,3 +331,180 @@ export async function resetPassword(token: string, newPassword: string) {
 
   return { success: true };
 }
+
+
+export async function completeOnboarding(data: {
+  boxName?: string;
+  phone?: string;
+  bio?: string;
+  competitionName?: string;
+  competitionLocation?: string;
+  competitionStartDate?: string;
+}) {
+  const { getServerSession } = await import("next-auth");
+  const { authOptions } = await import("./auth");
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    throw new Error("No autorizado");
+  }
+
+  const userId = session.user.id;
+
+  // Update organizer profile
+  await db.organizerProfile.update({
+    where: { userId },
+    data: {
+      boxName: data.boxName || undefined,
+      phone: data.phone || undefined,
+      bio: data.bio || undefined,
+      hasCompletedOnboarding: true,
+    },
+  });
+
+  // Create first competition if provided
+  if (data.competitionName && data.competitionStartDate) {
+    const baseSlug = slugify(data.competitionName);
+    let slug = baseSlug;
+    let counter = 1;
+
+    while (await db.competition.findUnique({ where: { slug } })) {
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+    }
+
+    const profile = await db.organizerProfile.findUnique({
+      where: { userId },
+    });
+
+    if (!profile) {
+      throw new Error("Perfil no encontrado");
+    }
+
+    const competition = await db.competition.create({
+      data: {
+        name: data.competitionName,
+        slug,
+        location: data.competitionLocation || null,
+        startDate: new Date(data.competitionStartDate),
+        endDate: null,
+        status: "PUBLISHED",
+        registrationFee: 0,
+        organizerId: profile.id,
+      },
+    });
+
+    // Create default categories
+    await db.category.createMany({
+      data: [
+        { competitionId: competition.id, name: "RX Masculino", divisionType: "RX", gender: "MALE", order: 0 },
+        { competitionId: competition.id, name: "RX Femenino", divisionType: "RX", gender: "FEMALE", order: 1 },
+        { competitionId: competition.id, name: "Scaled Masculino", divisionType: "SCALED", gender: "MALE", order: 2 },
+        { competitionId: competition.id, name: "Scaled Femenino", divisionType: "SCALED", gender: "FEMALE", order: 3 },
+      ],
+    });
+
+    // Create default WODs
+    await db.wOD.createMany({
+      data: [
+        { competitionId: competition.id, name: "WOD 1", scoringType: "FOR_TIME", order: 0, timeCapMinutes: 12 },
+        { competitionId: competition.id, name: "WOD 2", scoringType: "AMRAP", order: 1, timeCapMinutes: 10 },
+        { competitionId: competition.id, name: "WOD 3", scoringType: "FOR_TIME", order: 2, timeCapMinutes: 15 },
+      ],
+    });
+
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/competitions");
+  }
+
+  return { success: true };
+}
+
+
+export async function duplicateCompetition(sourceId: string) {
+  const { getServerSession } = await import("next-auth");
+  const { authOptions } = await import("./auth");
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    throw new Error("No autorizado");
+  }
+
+  const profile = await db.organizerProfile.findUnique({
+    where: { userId: session.user.id },
+  });
+
+  if (!profile) {
+    throw new Error("Perfil no encontrado");
+  }
+
+  const organizerId = profile.id;
+  const source = await db.competition.findUnique({
+    where: { id: sourceId },
+    include: { categories: true, wods: true },
+  });
+
+  if (!source) {
+    throw new Error("Competencia no encontrada");
+  }
+
+  // Generate unique slug
+  const baseSlug = slugify(source.name) + "-copy";
+  let slug = baseSlug;
+  let counter = 1;
+  while (await db.competition.findUnique({ where: { slug } })) {
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+
+  const newComp = await db.competition.create({
+    data: {
+      name: source.name + " (Copia)",
+      slug,
+      description: source.description,
+      location: source.location,
+      startDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
+      endDate: null,
+      registrationDeadline: null,
+      status: "DRAFT",
+      registrationFee: source.registrationFee,
+      currency: source.currency,
+      maxAthletes: source.maxAthletes,
+      organizerId,
+    },
+  });
+
+  // Clone categories
+  for (const cat of source.categories) {
+    await db.category.create({
+      data: {
+        competitionId: newComp.id,
+        name: cat.name,
+        gender: cat.gender,
+        divisionType: cat.divisionType,
+        minAge: cat.minAge,
+        maxAge: cat.maxAge,
+        maxAthletes: cat.maxAthletes,
+        order: cat.order,
+      },
+    });
+  }
+
+  // Clone WODs
+  for (const wod of source.wods) {
+    await db.wOD.create({
+      data: {
+        competitionId: newComp.id,
+        name: wod.name,
+        description: wod.description,
+        scoringType: wod.scoringType,
+        timeCapMinutes: wod.timeCapMinutes,
+        standards: wod.standards,
+        order: wod.order,
+      },
+    });
+  }
+
+  revalidatePath("/dashboard/competitions");
+  return newComp;
+}

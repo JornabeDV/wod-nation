@@ -10,7 +10,7 @@ import { useI18n } from "@/lib/i18n/provider";
 interface CompetitionRow {
   id: string;
   name: string;
-  date: string;
+  startDate: Date;
   location: string;
   athletes: number;
   status: any;
@@ -21,7 +21,18 @@ interface CompetitionsListViewProps {
 }
 
 export function CompetitionsListView({ competitions }: CompetitionsListViewProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+
+  const dateFormatter = new Intl.DateTimeFormat(locale === "es" ? "es-ES" : "en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  const formattedCompetitions = competitions.map((c) => ({
+    ...c,
+    date: dateFormatter.format(new Date(c.startDate)),
+  }));
 
   return (
     <div className="space-y-6">
@@ -39,7 +50,7 @@ export function CompetitionsListView({ competitions }: CompetitionsListViewProps
         }
       />
 
-      {competitions.length === 0 ? (
+      {formattedCompetitions.length === 0 ? (
         <div className="rounded-xl border border-border bg-surface-raised p-16 text-center">
           <Trophy size={40} className="mx-auto mb-4 text-text-muted" />
           <h3 className="text-lg font-semibold mb-2">{t.dashboard.competitions.empty.title}</h3>
@@ -56,7 +67,7 @@ export function CompetitionsListView({ competitions }: CompetitionsListViewProps
         </div>
       ) : (
         <AnimatedTable
-          data={competitions}
+          data={formattedCompetitions}
           columns={[
             {
               key: "name",

@@ -25,7 +25,11 @@ export default async function DashboardPage() {
     await db.organizerProfile.create({
       data: { userId: session.user.id },
     });
-    redirect("/dashboard");
+    redirect("/onboarding");
+  }
+
+  if (!profile.hasCompletedOnboarding) {
+    redirect("/onboarding");
   }
 
   const totalCompetitions = profile.competitions.length;

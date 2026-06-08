@@ -74,10 +74,11 @@ model OrganizerProfile {
   phone     String?
   boxName   String?
   bio       String?  @db.Text
-  website   String?
-  instagram String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  website               String?
+  instagram             String?
+  hasCompletedOnboarding Boolean  @default(false)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
   competitions Competition[]
 }

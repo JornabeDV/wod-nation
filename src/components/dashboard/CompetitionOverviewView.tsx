@@ -7,6 +7,7 @@ import {
   Layers,
   Dumbbell,
   ExternalLink,
+  UserCircle,
 } from "lucide-react";
 import { QRCodeButton } from "@/components/QRCode";
 import { useI18n } from "@/lib/i18n/provider";
@@ -30,6 +31,10 @@ interface CompetitionOverviewViewProps {
     registrationsCount: number;
     categories: Category[];
     wods: WOD[];
+    organizer?: {
+      id: string;
+      name: string | null;
+    };
   };
 }
 
@@ -96,6 +101,22 @@ export function CompetitionOverviewView({ competition }: CompetitionOverviewView
           <div className="text-2xl font-bold">{competition.wods.length}</div>
         </div>
       </div>
+
+      {/* Organizer */}
+      {competition.organizer && (
+        <div className="rounded-xl border border-border bg-surface-raised p-5">
+          <Link
+            href={`/organizer/${competition.organizer.id}`}
+            className="flex items-center gap-3 text-sm text-text-secondary hover:text-text transition-colors"
+          >
+            <UserCircle size={18} className="text-[#ff4d00]" />
+            <span>
+              Organizado por <span className="font-medium text-white">{competition.organizer.name}</span>
+            </span>
+            <ExternalLink size={14} className="ml-auto" />
+          </Link>
+        </div>
+      )}
 
       {/* Public Links */}
       <div className="rounded-xl border border-border bg-surface-raised p-5">

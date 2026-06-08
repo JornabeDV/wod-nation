@@ -39,6 +39,7 @@ export function Header() {
         <Link
           href="/dashboard/profile"
           className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-lg hover:bg-surface-raised transition-colors"
+          data-tour="header-profile"
         >
           <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-xs font-bold text-white">
             {session?.user?.name?.charAt(0) || "U"}

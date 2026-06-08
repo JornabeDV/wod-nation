@@ -18,8 +18,66 @@ import {
   ChevronLeft,
   Plus,
   X,
+  LayoutTemplate,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n/provider";
+
+const templates = {
+  blank: {
+    name: "",
+    categories: [
+      { name: "RX Masculino", gender: "MALE", divisionType: "RX" },
+      { name: "RX Femenino", gender: "FEMALE", divisionType: "RX" },
+      { name: "Scaled Masculino", gender: "MALE", divisionType: "SCALED" },
+      { name: "Scaled Femenino", gender: "FEMALE", divisionType: "SCALED" },
+    ],
+    wods: [
+      { name: "WOD 1", scoringType: "FOR_TIME", timeCapMinutes: "12", description: "" },
+      { name: "WOD 2", scoringType: "AMRAP", timeCapMinutes: "10", description: "" },
+      { name: "WOD 3", scoringType: "FOR_TIME", timeCapMinutes: "15", description: "" },
+    ],
+  },
+  murph: {
+    name: "Murph Day",
+    categories: [
+      { name: "RX", gender: "MALE", divisionType: "RX" },
+      { name: "RX", gender: "FEMALE", divisionType: "RX" },
+      { name: "Scaled", gender: "MALE", divisionType: "SCALED" },
+      { name: "Scaled", gender: "FEMALE", divisionType: "SCALED" },
+      { name: "Equipos", gender: "MIXED", divisionType: "CUSTOM" },
+    ],
+    wods: [
+      { name: "Murph", scoringType: "FOR_TIME", timeCapMinutes: "60", description: "1 mile run, 100 pull-ups, 200 push-ups, 300 squats, 1 mile run" },
+    ],
+  },
+  inhouse: {
+    name: "In-House Throwdown",
+    categories: [
+      { name: "Beginner", gender: "MALE", divisionType: "SCALED" },
+      { name: "Beginner", gender: "FEMALE", divisionType: "SCALED" },
+      { name: "Intermediate", gender: "MALE", divisionType: "RX" },
+      { name: "Intermediate", gender: "FEMALE", divisionType: "RX" },
+    ],
+    wods: [
+      { name: "WOD 1: Grace", scoringType: "FOR_TIME", timeCapMinutes: "10", description: "30 clean & jerks (135/95 lb)" },
+      { name: "WOD 2: Fran", scoringType: "FOR_TIME", timeCapMinutes: "10", description: "21-15-9 thrusters & pull-ups" },
+      { name: "WOD 3: Max Snatch", scoringType: "MAX_WEIGHT", timeCapMinutes: "6", description: "1-rep max squat snatch" },
+    ],
+  },
+  team: {
+    name: "Team Challenge",
+    categories: [
+      { name: "Equipos de 2 M/M", gender: "MALE", divisionType: "RX" },
+      { name: "Equipos de 2 F/F", gender: "FEMALE", divisionType: "RX" },
+      { name: "Equipos Mixtos", gender: "MIXED", divisionType: "RX" },
+    ],
+    wods: [
+      { name: "WOD 1: Synchro", scoringType: "FOR_TIME", timeCapMinutes: "15", description: "Synchronized burpees over bar, synchro thrusters" },
+      { name: "WOD 2: Relay", scoringType: "FOR_TIME", timeCapMinutes: "20", description: "Partner relay: row, box jumps, wall balls" },
+      { name: "WOD 3: Chipper", scoringType: "FOR_TIME", timeCapMinutes: "25", description: "Team chipper: divide reps as needed" },
+    ],
+  },
+} as const;
 
 export default function NewCompetitionWizard() {
   const router = useRouter();
@@ -46,22 +104,23 @@ export default function NewCompetitionWizard() {
     endDate: "",
   });
 
+  const [selectedTemplate, setSelectedTemplate] = useState<keyof typeof templates>("blank");
+
   const [categories, setCategories] = useState<
     { name: string; gender: string; divisionType: string }[]
-  >([
-    { name: "RX Masculino", gender: "MALE", divisionType: "RX" },
-    { name: "RX Femenino", gender: "FEMALE", divisionType: "RX" },
-    { name: "Scaled Masculino", gender: "MALE", divisionType: "SCALED" },
-    { name: "Scaled Femenino", gender: "FEMALE", divisionType: "SCALED" },
-  ]);
+  >([...templates.blank.categories]);
 
   const [wods, setWods] = useState<
     { name: string; scoringType: string; timeCapMinutes: string; description: string }[]
-  >([
-    { name: "WOD 1", scoringType: "FOR_TIME", timeCapMinutes: "10", description: "" },
-    { name: "WOD 2", scoringType: "AMRAP", timeCapMinutes: "20", description: "" },
-    { name: "WOD 3", scoringType: "MAX_WEIGHT", timeCapMinutes: "6", description: "" },
-  ]);
+  >([...templates.blank.wods]);
+
+  function applyTemplate(key: keyof typeof templates) {
+    setSelectedTemplate(key);
+    const t = templates[key];
+    setInfo((prev) => ({ ...prev, name: t.name || prev.name }));
+    setCategories(t.categories.map((c) => ({ ...c })));
+    setWods(t.wods.map((w) => ({ ...w })));
+  }
 
   const [registration, setRegistration] = useState({
     fee: "0",
@@ -134,6 +193,37 @@ export default function NewCompetitionWizard() {
         description={d.description}
         backHref="/dashboard/competitions"
       />
+
+      {/* Template Selector */}
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-3">
+          <LayoutTemplate size={16} className="text-[#ff4d00]" />
+          <span className="text-sm font-medium text-text-secondary">Plantilla (opcional)</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {([
+            { key: "blank", label: "En blanco", desc: "Empezar desde cero" },
+            { key: "murph", label: "Murph Day", desc: "1 WOD heroico" },
+            { key: "inhouse", label: "In-House", desc: "3 WODs clásicos" },
+            { key: "team", label: "Team", desc: "Equipos de 2" },
+          ] as const).map((t) => (
+            <button
+              key={t.key}
+              onClick={() => applyTemplate(t.key)}
+              className={`rounded-xl border px-4 py-3 text-left transition-all ${
+                selectedTemplate === t.key
+                  ? "border-[#ff4d00]/40 bg-[#ff4d00]/10"
+                  : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]"
+              }`}
+            >
+              <div className={`text-sm font-medium ${selectedTemplate === t.key ? "text-[#ff4d00]" : ""}`}>
+                {t.label}
+              </div>
+              <div className="text-xs text-text-muted">{t.desc}</div>
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Progress */}
       <div className="mb-8">

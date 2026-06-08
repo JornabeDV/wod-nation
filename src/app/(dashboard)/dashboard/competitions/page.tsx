@@ -25,15 +25,10 @@ export default async function CompetitionsPage() {
   const competitions = profile.competitions.map((comp) => ({
     id: comp.id,
     name: comp.name,
-    date: new Date(comp.startDate).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }),
+    startDate: comp.startDate,
     location: comp.location || "—",
     athletes: comp._count.registrations,
     status: comp.status.toLowerCase() as any,
-    slug: comp.slug,
   }));
 
   return <CompetitionsListView competitions={competitions} />;

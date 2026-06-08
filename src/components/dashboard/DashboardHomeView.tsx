@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
+import { DashboardTour } from "@/components/dashboard/DashboardTour";
 import {
   Trophy,
   TrendingUp,
@@ -47,14 +48,16 @@ export function DashboardHomeView({
 
   return (
     <div className="space-y-8">
+      <DashboardTour />
+
       {/* Header */}
-      <div>
+      <div data-tour="welcome">
         <h1 className="text-2xl font-bold tracking-tight">{t.dashboard.home.title}</h1>
         <p className="text-text-secondary mt-1">{welcome}</p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-tour="stats">
         <StatCard
           label={t.dashboard.home.stats.totalCompetitions}
           value={totalCompetitions}
@@ -90,7 +93,7 @@ export function DashboardHomeView({
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4" data-tour="quick-actions">
         <Link
           href="/dashboard/competitions/new"
           className="group flex items-center gap-4 rounded-xl border border-border bg-surface-raised p-5 hover:border-border-hover transition-all"
@@ -144,7 +147,7 @@ export function DashboardHomeView({
       </div>
 
       {/* Recent Competitions */}
-      <div>
+      <div data-tour="recent-competitions">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">{t.dashboard.home.recentCompetitions.title}</h2>
           <Link

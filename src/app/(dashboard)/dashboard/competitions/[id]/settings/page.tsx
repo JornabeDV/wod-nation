@@ -4,12 +4,15 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { updateCompetition, deleteCompetition } from "@/lib/actions";
 import { PageHeader } from "@/components/dashboard/PageHeader";
+import { useI18n } from "@/lib/i18n/provider";
 
 export default function SettingsPage() {
   const params = useParams();
   const router = useRouter();
   const competitionId = params.id as string;
   const [loading, setLoading] = useState(false);
+  const { t } = useI18n();
+  const d = t.dashboard.settingsPage;
 
   async function handleStatusChange(status: string) {
     setLoading(true);
@@ -19,7 +22,7 @@ export default function SettingsPage() {
   }
 
   async function handleDelete() {
-    if (!confirm("Are you sure you want to delete this competition? This cannot be undone.")) return;
+    if (!confirm(d.deleteConfirm)) return;
     setLoading(true);
     await deleteCompetition(competitionId);
     router.push("/dashboard/competitions");
@@ -27,10 +30,10 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Settings" description="Manage competition status and danger zone." />
+      <PageHeader title={d.title} description={d.description} />
 
       <div className="rounded-xl border border-border bg-surface-raised p-5">
-        <h3 className="text-sm font-medium mb-4">Competition Status</h3>
+        <h3 className="text-sm font-medium mb-4">{d.statusTitle}</h3>
         <div className="flex flex-wrap gap-2">
           {["DRAFT", "PUBLISHED", "LIVE", "FINISHED", "CANCELLED"].map((status) => (
             <button
@@ -39,23 +42,23 @@ export default function SettingsPage() {
               disabled={loading}
               className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-text-secondary hover:text-text hover:border-border-hover transition-colors disabled:opacity-50"
             >
-              Set {status}
+              {d.setStatus.replace("{status}", status)}
             </button>
           ))}
         </div>
       </div>
 
       <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-5">
-        <h3 className="text-sm font-medium text-red-400 mb-2">Danger Zone</h3>
+        <h3 className="text-sm font-medium text-red-400 mb-2">{d.dangerTitle}</h3>
         <p className="text-sm text-text-secondary mb-4">
-          Deleting a competition permanently removes all data including athletes, scores, and registrations.
+          {d.dangerDescription}
         </p>
         <button
           onClick={handleDelete}
           disabled={loading}
           className="rounded-lg bg-red-500/10 border border-red-500/20 px-4 py-2 text-sm font-medium text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-50"
         >
-          Delete Competition
+          {d.deleteButton}
         </button>
       </div>
     </div>

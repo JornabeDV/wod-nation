@@ -6,25 +6,28 @@ import { submitScore } from "@/lib/actions";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import { useI18n } from "@/lib/i18n/provider";
 
 export default function ScoresPage() {
   const params = useParams();
   const competitionId = params.id as string;
   const [wodId, setWodId] = useState("");
   const [categoryId, setCategoryId] = useState("");
+  const { t } = useI18n();
+  const d = t.dashboard.scoresPage;
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Score Entry" description="Enter scores by WOD and category." />
+      <PageHeader title={d.title} description={d.description} />
 
       <div className="rounded-xl border border-border bg-surface-raised p-5">
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="text-sm font-medium mb-2 block">WOD</label>
+            <label className="text-sm font-medium mb-2 block">{d.wod}</label>
             <WODSelect competitionId={competitionId} value={wodId} onChange={setWodId} />
           </div>
           <div>
-            <label className="text-sm font-medium mb-2 block">Category</label>
+            <label className="text-sm font-medium mb-2 block">{d.category}</label>
             <CategorySelect competitionId={competitionId} value={categoryId} onChange={setCategoryId} />
           </div>
         </div>
@@ -39,6 +42,7 @@ export default function ScoresPage() {
 
 function WODSelect({ competitionId, value, onChange }: { competitionId: string; value: string; onChange: (v: string) => void }) {
   const [wods, setWods] = useState<any[]>([]);
+  const { t } = useI18n();
 
   if (wods.length === 0) {
     fetch(`/api/competitions/${competitionId}/wods`)
@@ -48,7 +52,7 @@ function WODSelect({ competitionId, value, onChange }: { competitionId: string; 
 
   return (
     <select value={value} onChange={(e) => onChange(e.target.value)} className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 py-1 text-sm">
-      <option value="">Select...</option>
+      <option value="">{t.dashboard.scoresPage.select}</option>
       {wods.map((wod) => (
         <option key={wod.id} value={wod.id}>{wod.name}</option>
       ))}
@@ -58,6 +62,7 @@ function WODSelect({ competitionId, value, onChange }: { competitionId: string; 
 
 function CategorySelect({ competitionId, value, onChange }: { competitionId: string; value: string; onChange: (v: string) => void }) {
   const [categories, setCategories] = useState<any[]>([]);
+  const { t } = useI18n();
 
   if (categories.length === 0) {
     fetch(`/api/competitions/${competitionId}/categories`)
@@ -67,7 +72,7 @@ function CategorySelect({ competitionId, value, onChange }: { competitionId: str
 
   return (
     <select value={value} onChange={(e) => onChange(e.target.value)} className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 py-1 text-sm">
-      <option value="">Select...</option>
+      <option value="">{t.dashboard.scoresPage.select}</option>
       {categories.map((cat) => (
         <option key={cat.id} value={cat.id}>{cat.name}</option>
       ))}
@@ -79,6 +84,8 @@ function ScoreEntryTable({ competitionId, wodId, categoryId }: { competitionId: 
   const [athletes, setAthletes] = useState<any[]>([]);
   const [scores, setScores] = useState<Record<string, string>>({});
   const [loaded, setLoaded] = useState(false);
+  const { t } = useI18n();
+  const d = t.dashboard.scoresPage;
 
   if (!loaded) {
     fetch(`/api/competitions/${competitionId}/registrations`)
@@ -105,14 +112,14 @@ function ScoreEntryTable({ competitionId, wodId, categoryId }: { competitionId: 
     try {
       await submitScore({ competitionId, wodId, categoryId, athleteId, rawScore, value });
       toast({
-        title: "Score saved",
-        description: `Recorded ${rawScore}`,
+        title: d.toast.savedTitle,
+        description: d.toast.savedDescription.replace("{score}", rawScore),
         variant: "success",
       });
     } catch (err) {
       toast({
-        title: "Error saving score",
-        description: "Please try again.",
+        title: d.toast.errorTitle,
+        description: d.toast.errorDescription,
         variant: "destructive",
       });
     }
@@ -124,9 +131,9 @@ function ScoreEntryTable({ competitionId, wodId, categoryId }: { competitionId: 
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-surface">
-              <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase">Athlete</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase">Score</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase">Action</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase">{d.table.athlete}</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase">{d.table.score}</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase">{d.table.action}</th>
             </tr>
           </thead>
           <tbody>
@@ -147,7 +154,7 @@ function ScoreEntryTable({ competitionId, wodId, categoryId }: { competitionId: 
                     onClick={() => saveScore(reg.athleteId)}
                     className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text-secondary hover:text-text hover:border-border-hover transition-colors"
                   >
-                    Save
+                    {d.table.save}
                   </button>
                 </td>
               </tr>

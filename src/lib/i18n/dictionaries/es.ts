@@ -517,6 +517,14 @@ export const dictionary = {
       description: "Descripción",
       optional: "opcional",
     },
+    profilePage: {
+      title: "Perfil",
+      subtitle: "Tus datos de organizador.",
+      accountTitle: "Información de cuenta",
+      name: "Nombre",
+      email: "Email",
+      editingSoon: "La edición de perfil estará disponible próximamente.",
+    },
     status: {
       draft: "Borrador",
       published: "Publicada",
