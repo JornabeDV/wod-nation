@@ -419,3 +419,92 @@ export async function completeOnboarding(data: {
 
   return { success: true };
 }
+
+
+export async function duplicateCompetition(sourceId: string) {
+  const { getServerSession } = await import("next-auth");
+  const { authOptions } = await import("./auth");
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    throw new Error("No autorizado");
+  }
+
+  const profile = await db.organizerProfile.findUnique({
+    where: { userId: session.user.id },
+  });
+
+  if (!profile) {
+    throw new Error("Perfil no encontrado");
+  }
+
+  const organizerId = profile.id;
+  const source = await db.competition.findUnique({
+    where: { id: sourceId },
+    include: { categories: true, wods: true },
+  });
+
+  if (!source) {
+    throw new Error("Competencia no encontrada");
+  }
+
+  // Generate unique slug
+  const baseSlug = slugify(source.name) + "-copy";
+  let slug = baseSlug;
+  let counter = 1;
+  while (await db.competition.findUnique({ where: { slug } })) {
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+
+  const newComp = await db.competition.create({
+    data: {
+      name: source.name + " (Copia)",
+      slug,
+      description: source.description,
+      location: source.location,
+      startDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
+      endDate: null,
+      registrationDeadline: null,
+      status: "DRAFT",
+      registrationFee: source.registrationFee,
+      currency: source.currency,
+      maxAthletes: source.maxAthletes,
+      organizerId,
+    },
+  });
+
+  // Clone categories
+  for (const cat of source.categories) {
+    await db.category.create({
+      data: {
+        competitionId: newComp.id,
+        name: cat.name,
+        gender: cat.gender,
+        divisionType: cat.divisionType,
+        minAge: cat.minAge,
+        maxAge: cat.maxAge,
+        maxAthletes: cat.maxAthletes,
+        order: cat.order,
+      },
+    });
+  }
+
+  // Clone WODs
+  for (const wod of source.wods) {
+    await db.wOD.create({
+      data: {
+        competitionId: newComp.id,
+        name: wod.name,
+        description: wod.description,
+        scoringType: wod.scoringType,
+        timeCapMinutes: wod.timeCapMinutes,
+        standards: wod.standards,
+        order: wod.order,
+      },
+    });
+  }
+
+  revalidatePath("/dashboard/competitions");
+  return newComp;
+}

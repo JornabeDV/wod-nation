@@ -2,8 +2,8 @@ import { getServerSession } from "next-auth";
 import { redirect, notFound } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { PageHeader } from "@/components/dashboard/PageHeader";
 import { CompetitionTabs } from "@/components/layout/competition-tabs";
+import { CompetitionHeader } from "@/components/dashboard/CompetitionHeader";
 
 export default async function CompetitionLayout({
   children,
@@ -28,16 +28,10 @@ export default async function CompetitionLayout({
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={competition.name}
-        description={`${competition.location || "No location"} · ${new Date(
-          competition.startDate
-        ).toLocaleDateString("en-US", {
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-        })}`}
-        backHref="/dashboard/competitions"
+      <CompetitionHeader
+        name={competition.name}
+        location={competition.location}
+        startDate={competition.startDate}
       />
 
       <CompetitionTabs competitionId={id} />

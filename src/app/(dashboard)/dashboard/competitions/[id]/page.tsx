@@ -13,6 +13,11 @@ export default async function CompetitionDetailPage({
     include: {
       categories: { orderBy: { order: "asc" } },
       wods: { orderBy: { order: "asc" } },
+      organizer: {
+        include: {
+          user: { select: { name: true } },
+        },
+      },
       _count: { select: { registrations: true } },
     },
   });
@@ -35,6 +40,10 @@ export default async function CompetitionDetailPage({
           name: wod.name,
           scoringType: wod.scoringType,
         })),
+        organizer: {
+          id: competition.organizer.id,
+          name: competition.organizer.user.name,
+        },
       }}
     />
   );
