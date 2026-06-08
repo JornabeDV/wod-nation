@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { ReactNode } from "react";
+import { useI18n } from "@/lib/i18n/provider";
 
 interface PageHeaderProps {
   title: string;
@@ -12,6 +13,8 @@ interface PageHeaderProps {
 }
 
 export function PageHeader({ title, description, backHref, actions }: PageHeaderProps) {
+  const { t } = useI18n();
+
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
       <div>
@@ -21,7 +24,7 @@ export function PageHeader({ title, description, backHref, actions }: PageHeader
             className="inline-flex items-center gap-1 text-sm text-text-secondary hover:text-text transition-colors mb-2"
           >
             <ArrowLeft size={14} />
-            Back
+            {t.dashboard.pageHeader.back}
           </Link>
         )}
         <h1 className="text-2xl font-bold tracking-tight">{title}</h1>

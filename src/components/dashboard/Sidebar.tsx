@@ -7,9 +7,7 @@ import {
   LayoutDashboard,
   Trophy,
   PlusCircle,
-  Users,
   Settings,
-  BarChart3,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -17,17 +15,20 @@ import {
 import { signOut } from "next-auth/react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
-const navItems = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Competitions", href: "/dashboard/competitions", icon: Trophy },
-  { label: "New Competition", href: "/dashboard/competitions/new", icon: PlusCircle },
-  { label: "Settings", href: "/dashboard/profile", icon: Settings },
-];
+import { useI18n } from "@/lib/i18n/provider";
+import { LanguageSwitcher } from "@/components/ui/language/LanguageSwitcher";
 
 export function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const { t } = useI18n();
+
+  const navItems = [
+    { label: t.dashboard.sidebar.dashboard, href: "/dashboard", icon: LayoutDashboard },
+    { label: t.dashboard.sidebar.competitions, href: "/dashboard/competitions", icon: Trophy },
+    { label: t.dashboard.sidebar.newCompetition, href: "/dashboard/competitions/new", icon: PlusCircle },
+    { label: t.dashboard.sidebar.settings, href: "/dashboard/profile", icon: Settings },
+  ];
 
   return (
     <motion.aside
@@ -104,6 +105,16 @@ export function Sidebar() {
         })}
       </nav>
 
+      {/* Language Switcher */}
+      {!collapsed && (
+        <div className="px-4 py-2 border-t border-border">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-text-muted">{t.language.label}</span>
+            <LanguageSwitcher />
+          </div>
+        </div>
+      )}
+
       {/* Bottom */}
       <div className="p-2 border-t border-border">
         <button
@@ -112,7 +123,7 @@ export function Sidebar() {
             "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-text-secondary hover:text-text hover:bg-surface-elevated transition-all w-full",
             collapsed && "justify-center"
           )}
-          title={collapsed ? "Sign out" : undefined}
+          title={collapsed ? t.dashboard.sidebar.signOut : undefined}
         >
           <LogOut size={18} className="shrink-0" />
           <AnimatePresence>
@@ -123,7 +134,7 @@ export function Sidebar() {
                 exit={{ opacity: 0, width: 0 }}
                 className="whitespace-nowrap overflow-hidden"
               >
-                Sign out
+                {t.dashboard.sidebar.signOut}
               </motion.span>
             )}
           </AnimatePresence>

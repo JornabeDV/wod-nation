@@ -4,7 +4,10 @@ import { db } from "./db";
 import { revalidatePath } from "next/cache";
 import { CompetitionStatus, ScoringType } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { broadcast } from "./events";
+import { sendEmail, isEmailConfigured } from "./email";
+import { passwordResetEmailTemplate } from "./email-templates";
 
 function slugify(name: string) {
   return name
@@ -258,4 +261,73 @@ export async function createManualRegistration(data: {
 
   revalidatePath(`/dashboard/competitions/${data.competitionId}/athletes`);
   return { athlete, registration };
+}
+
+
+export async function requestPasswordReset(email: string) {
+  const user = await db.user.findUnique({ where: { email } });
+
+  // Don't reveal if user exists for security
+  if (!user) {
+    return { success: true };
+  }
+
+  const token = crypto.randomBytes(32).toString("hex");
+  const expires = new Date(Date.now() + 1000 * 60 * 60); // 1 hour
+
+  await db.user.update({
+    where: { id: user.id },
+    data: {
+      resetToken: token,
+      resetTokenExpires: expires,
+    },
+  });
+
+  const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${token}`;
+
+  const { html, subject, text } = passwordResetEmailTemplate(resetUrl, user.name);
+
+  const emailConfigured = isEmailConfigured();
+
+  if (emailConfigured) {
+    try {
+      await sendEmail({ to: email, subject, html, text });
+    } catch {
+      // Even if email fails, don't leak that user exists
+    }
+  } else {
+    // Log for development/testing until Resend is configured
+    console.log("\n🔐 PASSWORD RESET LINK (Resend not configured)\n");
+    console.log(`   Email: ${email}`);
+    console.log(`   URL:   ${resetUrl}\n`);
+  }
+
+  return { success: true, emailConfigured };
+}
+
+export async function resetPassword(token: string, newPassword: string) {
+  if (!token || newPassword.length < 6) {
+    throw new Error("Token inválido o contraseña demasiado corta");
+  }
+
+  const user = await db.user.findUnique({
+    where: { resetToken: token },
+  });
+
+  if (!user || !user.resetTokenExpires || user.resetTokenExpires < new Date()) {
+    throw new Error("El link de recuperación expiró o es inválido");
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+  await db.user.update({
+    where: { id: user.id },
+    data: {
+      password: hashedPassword,
+      resetToken: null,
+      resetTokenExpires: null,
+    },
+  });
+
+  return { success: true };
 }

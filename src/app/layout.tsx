@@ -14,16 +14,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "WODNation — The Future of Fitness Competitions",
+  title: "WODNation — El Futuro de las Competiciones de Fitness",
   description:
-    "Create events, collect payments, track scores, and display live leaderboards for CrossFit and functional fitness competitions.",
+    "Crea eventos, cobra inscripciones, registra scores y muestra leaderboards en vivo para competiciones de CrossFit y fitness funcional.",
   keywords: [
     "CrossFit",
-    "competition",
+    "competición",
     "leaderboard",
     "WOD",
-    "fitness events",
-    "functional fitness",
+    "eventos de fitness",
+    "fitness funcional",
   ],
   authors: [{ name: "WODNation" }],
   manifest: "/manifest.json",
@@ -49,7 +49,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="es"
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
       <head>
