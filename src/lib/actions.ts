@@ -59,6 +59,14 @@ export async function createCompetition(data: {
   maxAthletes?: number;
   organizerId: string;
 }) {
+  const profile = await db.organizerProfile.findUnique({
+    where: { userId: data.organizerId },
+  });
+
+  if (!profile) {
+    throw new Error("No se encontró el perfil de organizador para este usuario");
+  }
+
   const baseSlug = slugify(data.name);
   let slug = baseSlug;
   let counter = 1;
@@ -81,7 +89,7 @@ export async function createCompetition(data: {
         : null,
       registrationFee: data.registrationFee ?? 0,
       maxAthletes: data.maxAthletes,
-      organizerId: data.organizerId,
+      organizerId: profile.id,
     },
   });
 
@@ -507,4 +515,46 @@ export async function duplicateCompetition(sourceId: string) {
 
   revalidatePath("/dashboard/competitions");
   return newComp;
+}
+
+
+export async function updateOrganizerProfile(data: {
+  name?: string;
+  boxName?: string;
+  phone?: string;
+  bio?: string;
+  website?: string;
+  instagram?: string;
+}) {
+  const { getServerSession } = await import("next-auth");
+  const { authOptions } = await import("./auth");
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    throw new Error("No autorizado");
+  }
+
+  const userId = session.user.id;
+
+  await db.user.update({
+    where: { id: userId },
+    data: {
+      name: data.name || undefined,
+    },
+  });
+
+  await db.organizerProfile.update({
+    where: { userId },
+    data: {
+      boxName: data.boxName || undefined,
+      phone: data.phone || undefined,
+      bio: data.bio || undefined,
+      website: data.website || undefined,
+      instagram: data.instagram || undefined,
+    },
+  });
+
+  revalidatePath("/dashboard/profile");
+  revalidatePath(`/organizer/${userId}`);
+  return { success: true };
 }
