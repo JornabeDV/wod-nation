@@ -8,6 +8,7 @@ import { createCompetition, createCategory, createWOD } from "@/lib/actions";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DateTimePicker } from "@/components/ui/date-time-picker";
 import {
   FileText,
   Layers,
@@ -308,18 +309,16 @@ export default function NewCompetitionWizard() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label>{d.info.startDate}</Label>
-                  <Input
-                    type="datetime-local"
+                  <DateTimePicker
                     value={info.startDate}
-                    onChange={(e) => setInfo({ ...info, startDate: e.target.value })}
+                    onChange={(val) => setInfo({ ...info, startDate: val })}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>{d.info.endDate}</Label>
-                  <Input
-                    type="datetime-local"
+                  <DateTimePicker
                     value={info.endDate}
-                    onChange={(e) => setInfo({ ...info, endDate: e.target.value })}
+                    onChange={(val) => setInfo({ ...info, endDate: val })}
                   />
                 </div>
               </div>
@@ -494,10 +493,9 @@ export default function NewCompetitionWizard() {
               </div>
               <div className="space-y-2">
                 <Label>{d.registration.deadline}</Label>
-                <Input
-                  type="datetime-local"
+                <DateTimePicker
                   value={registration.deadline}
-                  onChange={(e) => setRegistration({ ...registration, deadline: e.target.value })}
+                  onChange={(val) => setRegistration({ ...registration, deadline: val })}
                 />
               </div>
               <div className="space-y-2">

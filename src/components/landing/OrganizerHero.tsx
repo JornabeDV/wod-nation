@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 function FloatingOrb({
   className,
@@ -29,29 +29,13 @@ function FloatingOrb({
   );
 }
 
-export function Hero() {
-  const headline = "Descubrí, competí, superate.";
-  const words = headline.split(" ");
-  const normalWords = words.slice(0, -1);
-  const lastWord = words[words.length - 1];
-
+export function OrganizerHero() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
-      {/* Background orbs */}
-      <FloatingOrb
-        className="top-1/4 left-1/4 w-96 h-96 bg-primary"
-        delay={0}
-      />
-      <FloatingOrb
-        className="bottom-1/4 right-1/4 w-80 h-80 bg-accent-purple"
-        delay={2}
-      />
-      <FloatingOrb
-        className="top-1/2 right-1/3 w-64 h-64 bg-accent-blue"
-        delay={4}
-      />
+      <FloatingOrb className="top-1/4 left-1/4 w-96 h-96 bg-primary" delay={0} />
+      <FloatingOrb className="bottom-1/4 right-1/4 w-80 h-80 bg-accent-purple" delay={2} />
+      <FloatingOrb className="top-1/2 right-1/3 w-64 h-64 bg-accent-blue" delay={4} />
 
-      {/* Grid pattern overlay */}
       <div
         className="absolute inset-0 opacity-[0.02]"
         style={{
@@ -61,7 +45,6 @@ export function Hero() {
       />
 
       <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
-        {/* Badge */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -73,52 +56,46 @@ export function Hero() {
             <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
           </span>
           <span className="text-sm text-text-secondary">
-            Competencias abiertas — inscribite ahora
+            La plataforma preferida por boxes de Latinoamérica
           </span>
         </motion.div>
 
-        {/* Headline */}
         <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
-          {normalWords.map((word, i) => (
-            <motion.span
-              key={i}
-              className="inline-block mr-[0.25em]"
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.5,
-                delay: 0.3 + i * 0.08,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-            >
-              {word}
-            </motion.span>
-          ))}
+          <motion.span
+            className="inline-block mr-[0.25em]"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          >
+            Organizá
+          </motion.span>
+          <motion.span
+            className="inline-block mr-[0.25em]"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.38, ease: [0.22, 1, 0.36, 1] }}
+          >
+            competencias
+          </motion.span>
           <motion.span
             className="inline-block text-gradient-primary"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.5,
-              delay: 0.3 + normalWords.length * 0.08,
-              ease: [0.22, 1, 0.36, 1],
-            }}
+            transition={{ duration: 0.5, delay: 0.46, ease: [0.22, 1, 0.36, 1] }}
           >
-            {lastWord}
+            como un pro.
           </motion.span>
         </h1>
 
-        {/* Subheadline */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto max-w-2xl text-lg sm:text-xl text-text-secondary mb-10"
         >
-          Descubrí eventos de CrossFit y fitness funcional en tu región. Inscribite online, competí con los mejores y seguí tu progreso en tiempo real.
+          La plataforma todo-en-uno para competencias de CrossFit y fitness funcional. Creá eventos, cobrá inscripciones, registrá puntajes y mostrá tablas de posiciones en vivo.
         </motion.p>
 
-        {/* CTAs */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -126,25 +103,20 @@ export function Hero() {
           className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
         >
           <Link
-            href="/competitions"
+            href="/register?role=organizer"
             className="group relative inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-semibold text-white transition-all hover:bg-primary-glow glow-primary"
           >
-            Explorar competencias
-            <ArrowRight
-              size={18}
-              className="transition-transform group-hover:translate-x-1"
-            />
+            Empezar gratis
+            <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
           </Link>
           <Link
-            href="/organize"
+            href="/competitions"
             className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface-raised px-8 py-4 text-base font-medium text-text-secondary transition-all hover:border-border-hover hover:text-text"
           >
-            <Play size={18} className="text-primary" />
-            Quiero organizar un evento
+            Ver competencias de ejemplo
           </Link>
         </motion.div>
 
-        {/* Social proof */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -161,11 +133,10 @@ export function Hero() {
               </div>
             ))}
           </div>
-          <span>Ya son <strong>500+ atletas</strong> compitiendo en WODNation</span>
+          <span>Con la confianza de <strong>más de 50 boxes</strong> en Latinoamérica</span>
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
       <motion.div
         className="absolute bottom-8 left-1/2 -translate-x-1/2"
         animate={{ y: [0, 8, 0] }}

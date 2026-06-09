@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { DatePicker } from "@/components/ui/date-picker";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -18,25 +20,45 @@ import {
   Mail,
   Phone,
   Dumbbell,
+  LogIn,
 } from "lucide-react";
 
 export default function RegisterPage() {
   const params = useParams();
   const router = useRouter();
   const slug = params.slug as string;
+  const { data: session, status } = useSession();
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [birthDate, setBirthDate] = useState("");
   const [categories, setCategories] = useState<any[]>([]);
   const [competition, setCompetition] = useState<any>(null);
+  const [athleteProfile, setAthleteProfile] = useState<any>(null);
 
-  if (!competition) {
+  useEffect(() => {
     fetch(`/api/competitions/slug/${slug}`)
       .then((r) => r.json())
       .then((data) => {
         setCompetition(data);
         setCategories(data.categories || []);
       });
-  }
+  }, [slug]);
+
+  useEffect(() => {
+    if (session?.user && status === "authenticated") {
+      fetch("/api/user/athlete-profile")
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.athlete) {
+            setAthleteProfile(data.athlete);
+            if (data.athlete.birthDate) {
+              setBirthDate(new Date(data.athlete.birthDate).toISOString().split("T")[0]);
+            }
+          }
+        })
+        .catch(() => {});
+    }
+  }, [session, status]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -71,10 +93,54 @@ export default function RegisterPage() {
     }
   }
 
-  if (!competition) {
+  if (status === "loading" || !competition) {
     return (
       <div className="min-h-screen bg-[#050505] flex items-center justify-center">
         <Loader2 size={32} className="animate-spin text-[#ff4d00]" />
+      </div>
+    );
+  }
+
+  if (status === "unauthenticated") {
+    return (
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center px-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center space-y-6 max-w-md"
+        >
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#ff4d00]/10 text-[#ff4d00]">
+            <LogIn size={40} />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold mb-2">Iniciá sesión para inscribirte</h1>
+            <p className="text-text-secondary">
+              Para registrarte a <span className="text-white font-medium">{competition?.name}</span> necesitás una cuenta de atleta.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              href={`/login?callbackUrl=/competitions/${slug}/register`}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#ff4d00] to-[#ff6b35] px-6 py-3 text-sm font-semibold text-white"
+            >
+              Iniciar sesión
+              <ChevronRight size={16} />
+            </Link>
+            <Link
+              href={`/register?callbackUrl=/competitions/${slug}/register`}
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] px-6 py-3 text-sm font-medium text-white hover:bg-white/[0.06] transition-colors"
+            >
+              Crear cuenta
+            </Link>
+          </div>
+          <Link
+            href={`/competitions/${slug}`}
+            className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-white transition-colors"
+          >
+            <ArrowLeft size={16} />
+            Volver a la competencia
+          </Link>
+        </motion.div>
       </div>
     );
   }
@@ -178,6 +244,7 @@ export default function RegisterPage() {
               <input
                 name="name"
                 required
+                defaultValue={athleteProfile?.name || ""}
                 placeholder="Juan Pérez"
                 className="flex h-11 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 text-sm text-white placeholder:text-text-muted focus:outline-none focus:border-[#ff4d00]/50 focus:ring-1 focus:ring-[#ff4d00]/20 transition-all"
               />
@@ -189,6 +256,7 @@ export default function RegisterPage() {
                 name="email"
                 type="email"
                 required
+                defaultValue={athleteProfile?.email || session?.user?.email || ""}
                 placeholder="juan@email.com"
                 className="flex h-11 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 text-sm text-white placeholder:text-text-muted focus:outline-none focus:border-[#ff4d00]/50 focus:ring-1 focus:ring-[#ff4d00]/20 transition-all"
               />
@@ -214,6 +282,7 @@ export default function RegisterPage() {
                   <select
                     name="gender"
                     required
+                    defaultValue={athleteProfile?.gender || ""}
                     className="w-full appearance-none rounded-xl border border-white/[0.08] bg-white/[0.03] pl-10 pr-10 py-2.5 text-sm text-white focus:outline-none focus:border-[#ff4d00]/50 transition-all"
                   >
                     <option value="">Seleccionar...</option>
@@ -247,6 +316,7 @@ export default function RegisterPage() {
               <label className="text-sm font-medium text-text-secondary">Box / Affiliate</label>
               <input
                 name="boxName"
+                defaultValue={athleteProfile?.boxName || ""}
                 placeholder="CrossFit Buenos Aires"
                 className="flex h-11 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 text-sm text-white placeholder:text-text-muted focus:outline-none focus:border-[#ff4d00]/50 focus:ring-1 focus:ring-[#ff4d00]/20 transition-all"
               />
@@ -254,10 +324,11 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-text-secondary">Fecha de nacimiento</label>
-              <input
+              <DatePicker
                 name="birthDate"
-                type="date"
-                className="flex h-11 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 text-sm text-white focus:outline-none focus:border-[#ff4d00]/50 focus:ring-1 focus:ring-[#ff4d00]/20 transition-all"
+                value={birthDate}
+                onChange={setBirthDate}
+                placeholder="Seleccionar fecha"
               />
             </div>
 

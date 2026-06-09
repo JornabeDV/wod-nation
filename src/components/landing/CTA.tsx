@@ -32,16 +32,24 @@ export function CTA() {
           <p className="text-text-secondary text-lg mb-10 max-w-2xl mx-auto">
             {t.cta.subtitle}
           </p>
-          <Link
-            href="/register"
-            className="group inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-semibold text-white transition-all hover:bg-primary-glow glow-primary"
-          >
-            {t.cta.button}
-            <ArrowRight
-              size={18}
-              className="transition-transform group-hover:translate-x-1"
-            />
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/competitions"
+              className="group inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-semibold text-white transition-all hover:bg-primary-glow glow-primary"
+            >
+              Quiero competir
+              <ArrowRight
+                size={18}
+                className="transition-transform group-hover:translate-x-1"
+              />
+            </Link>
+            <Link
+              href="/register"
+              className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface-raised px-8 py-4 text-base font-medium text-text-secondary transition-all hover:border-border-hover hover:text-text"
+            >
+              Quiero organizar un evento
+            </Link>
+          </div>
         </motion.div>
       </div>
     </section>

@@ -13,12 +13,12 @@ import {
   CheckCircle2,
   Loader2,
   MapPin,
-  Calendar,
   Users,
   Zap,
 } from "lucide-react";
 import { completeOnboarding } from "@/lib/actions";
 import { toast } from "@/hooks/use-toast";
+import { DatePicker } from "@/components/ui/date-picker";
 
 const steps = [
   { id: "welcome", label: "Bienvenida" },
@@ -381,15 +381,11 @@ function CompetitionStep({
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium text-text-secondary">Fecha de inicio *</label>
-          <div className="relative">
-            <Calendar size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
-            <input
-              type="date"
-              value={data.startDate}
-              onChange={(e) => onChange({ ...data, startDate: e.target.value })}
-              className="flex h-11 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] pl-10 pr-4 text-sm text-white focus:outline-none focus:border-[#ff4d00]/50 focus:ring-1 focus:ring-[#ff4d00]/20 transition-all"
-            />
-          </div>
+          <DatePicker
+            value={data.startDate}
+            onChange={(val) => onChange({ ...data, startDate: val })}
+            placeholder="Seleccionar fecha"
+          />
         </div>
       </div>
 

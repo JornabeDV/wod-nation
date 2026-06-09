@@ -3,29 +3,30 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 
-export function HowItWorks() {
+const steps = [
+  {
+    number: "01",
+    title: "Creá tu competencia",
+    description:
+      "Configurá tu evento en minutos. Definí categorías, WODs, reglas de scoring y precios de inscripción.",
+  },
+  {
+    number: "02",
+    title: "Los atletas se inscriben y pagan",
+    description:
+      "Compartí un link. Los atletas se registran y pagan online. Sin perseguir pagos ni administrar hojas de cálculo.",
+  },
+  {
+    number: "03",
+    title: "Puntaje y transmisión en vivo",
+    description:
+      "Los jueces cargan scores desde cualquier dispositivo. El leaderboard se actualiza instantáneamente.",
+  },
+];
+
+export function OrganizerHowItWorks() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const steps = [
-    {
-      number: "01",
-      title: "Encontrá tu competencia",
-      description:
-        "Buscá eventos por fecha, ubicación o categoría. Desde competencias locales hasta torneos regionales.",
-    },
-    {
-      number: "02",
-      title: "Inscribite en minutos",
-      description:
-        "Completá tus datos, elegí tu categoría y pagá online. Sin papeleos ni filas.",
-    },
-    {
-      number: "03",
-      title: "Competí y seguí tu ranking",
-      description:
-        "Accedé al leaderboard en vivo desde tu celular. Mirá tu posición en tiempo real mientras competís.",
-    },
-  ];
 
   return (
     <section id="how-it-works" className="py-24 sm:py-32 bg-surface">
@@ -38,11 +39,11 @@ export function HowItWorks() {
           className="text-center mb-20"
         >
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            De la inscripción al podium en{" "}
+            De la idea a la competencia en{" "}
             <span className="text-gradient-primary">3 pasos</span>
           </h2>
           <p className="text-text-secondary max-w-2xl mx-auto">
-            Te simplificamos todo para que solo te preocupes por dar lo mejor de vos.
+            Eliminamos la complejidad para que te enfoques en lo importante: organizar un evento épico.
           </p>
         </motion.div>
 
@@ -67,7 +68,6 @@ export function HowItWorks() {
                 {step.description}
               </p>
 
-              {/* Connector line */}
               {i < steps.length - 1 && (
                 <div className="hidden md:block absolute top-12 left-full w-full h-px">
                   <div className="w-full h-full bg-gradient-to-r from-border via-border to-transparent" />

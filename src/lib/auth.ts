@@ -50,10 +50,38 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account, profile }) {
+      if (account?.provider === "google") {
+        const existing = await db.user.findUnique({
+          where: { email: user.email! },
+        });
+        if (!existing) {
+          await db.user.create({
+            data: {
+              email: user.email!,
+              name: user.name,
+              image: user.image,
+              role: "ATHLETE",
+            },
+          });
+        }
+      }
+      return true;
+    },
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+      }
+      if (account?.provider === "google" && token.email) {
+        const dbUser = await db.user.findUnique({
+          where: { email: token.email },
+          select: { id: true, role: true },
+        });
+        if (dbUser) {
+          token.id = dbUser.id;
+          token.role = dbUser.role;
+        }
       }
       return token;
     },

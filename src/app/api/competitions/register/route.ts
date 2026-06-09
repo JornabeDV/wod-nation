@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
 import { db } from "@/lib/db";
+import { authOptions } from "@/lib/auth";
 import { createPaymentPreference } from "@/lib/mercadopago";
 import { sendEmail, isEmailConfigured } from "@/lib/email";
 import { newRegistrationEmailTemplate } from "@/lib/email-templates";
@@ -8,6 +10,9 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { slug, name, email, phone, gender, birthDate, boxName, categoryId } = body;
+
+    const session = await getServerSession(authOptions);
+    const isAthleteUser = (session?.user as any)?.role === "ATHLETE";
 
     const competition = await db.competition.findUnique({ where: { slug } });
     if (!competition) {
@@ -31,24 +36,65 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Create athlete
-    const athlete = await db.athlete.create({
-      data: {
-        name,
-        email,
-        phone,
-        gender,
-        birthDate: birthDate ? new Date(birthDate) : null,
-        boxName,
-      },
-    });
+    let athleteId: string;
+
+    if (isAthleteUser && session?.user?.id) {
+      // Try to find existing athlete for this user
+      const existingAthlete = await db.athlete.findUnique({
+        where: { userId: session.user.id },
+      });
+
+      if (existingAthlete) {
+        // Update athlete data if provided
+        athleteId = existingAthlete.id;
+        if (name || email || phone || boxName || gender || birthDate) {
+          await db.athlete.update({
+            where: { id: athleteId },
+            data: {
+              name: name || undefined,
+              email: email || undefined,
+              phone: phone || undefined,
+              boxName: boxName || undefined,
+              gender: gender || undefined,
+              birthDate: birthDate ? new Date(birthDate) : undefined,
+            },
+          });
+        }
+      } else {
+        const newAthlete = await db.athlete.create({
+          data: {
+            userId: session.user.id,
+            name: name || session.user.name || "Sin nombre",
+            email: email || session.user.email || undefined,
+            phone,
+            gender,
+            birthDate: birthDate ? new Date(birthDate) : null,
+            boxName,
+          },
+        });
+        athleteId = newAthlete.id;
+      }
+    } else {
+      // Anonymous registration
+      const athlete = await db.athlete.create({
+        data: {
+          name,
+          email,
+          phone,
+          gender,
+          birthDate: birthDate ? new Date(birthDate) : null,
+          boxName,
+        },
+      });
+      athleteId = athlete.id;
+    }
 
     // Create registration
     const registration = await db.registration.create({
       data: {
         competitionId: competition.id,
         categoryId,
-        athleteId: athlete.id,
+        athleteId,
         paymentStatus: competition.registrationFee > 0 ? "PENDING" : "FREE",
       },
     });
@@ -61,9 +107,10 @@ export async function POST(req: NextRequest) {
       });
 
       if (organizer?.user?.email && isEmailConfigured()) {
+        const athleteRecord = await db.athlete.findUnique({ where: { id: athleteId } });
         const { html, subject, text } = newRegistrationEmailTemplate(
           competition.name,
-          athlete.name,
+          athleteRecord?.name || "Atleta",
           category.name,
           organizer.user.name
         );

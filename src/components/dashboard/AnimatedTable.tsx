@@ -16,6 +16,7 @@ interface AnimatedTableProps<T> {
   data: T[];
   emptyMessage?: string;
   className?: string;
+  onRowClick?: (row: T) => void;
 }
 
 export function AnimatedTable<T extends { id: string }>({
@@ -23,6 +24,7 @@ export function AnimatedTable<T extends { id: string }>({
   data,
   emptyMessage = "No data found.",
   className,
+  onRowClick,
 }: AnimatedTableProps<T>) {
   if (data.length === 0) {
     return (
@@ -60,8 +62,9 @@ export function AnimatedTable<T extends { id: string }>({
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, delay: i * 0.04, ease: [0.22, 1, 0.36, 1] }}
+                onClick={() => onRowClick?.(row)}
                 className={cn(
-                  "border-b border-border/50 transition-colors hover:bg-surface-elevated/50",
+                  "border-b border-border/50 transition-colors hover:bg-surface-elevated/50 cursor-pointer",
                   i === data.length - 1 && "border-b-0"
                 )}
               >
