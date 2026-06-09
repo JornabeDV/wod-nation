@@ -16,6 +16,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { LeaderboardExport } from "@/components/leaderboard/LeaderboardExport";
+import { CertificateGenerator } from "@/components/certificates/CertificateGenerator";
 import Link from "next/link";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -362,6 +363,7 @@ export default function LeaderboardPage() {
                     <th className="px-4 py-3 text-center text-xs font-medium text-text-muted uppercase print:text-gray-600">
                       Total
                     </th>
+                    <th className="px-4 py-3 text-xs font-medium text-text-muted uppercase print:hidden w-24"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -405,6 +407,15 @@ export default function LeaderboardPage() {
                         ))}
                         <td className="px-4 py-3 text-center font-bold">
                           {row.totalPoints}
+                        </td>
+                        <td className="px-4 py-3 print:hidden">
+                          <CertificateGenerator
+                            athleteName={row.athleteName}
+                            competitionName={competition.name}
+                            categoryName={competition.categories.find((c: any) => c.id === categoryId)?.name}
+                            date={new Date(competition.startDate).toLocaleDateString("es-AR")}
+                            rank={row.overallRank}
+                          />
                         </td>
                       </motion.tr>
                     ))}

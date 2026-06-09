@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { createPaymentPreference } from "@/lib/mercadopago";
+import { sendEmail, isEmailConfigured } from "@/lib/email";
+import { newRegistrationEmailTemplate } from "@/lib/email-templates";
 
 export async function POST(req: NextRequest) {
   try {
@@ -50,6 +52,31 @@ export async function POST(req: NextRequest) {
         paymentStatus: competition.registrationFee > 0 ? "PENDING" : "FREE",
       },
     });
+
+    // Send notification email to organizer
+    try {
+      const organizer = await db.organizerProfile.findUnique({
+        where: { id: competition.organizerId },
+        include: { user: { select: { email: true, name: true } } },
+      });
+
+      if (organizer?.user?.email && isEmailConfigured()) {
+        const { html, subject, text } = newRegistrationEmailTemplate(
+          competition.name,
+          athlete.name,
+          category.name,
+          organizer.user.name
+        );
+        await sendEmail({
+          to: organizer.user.email,
+          subject,
+          html,
+          text,
+        });
+      }
+    } catch (emailErr) {
+      console.error("[Registration] Failed to send notification email:", emailErr);
+    }
 
     if (competition.registrationFee > 0) {
       const preference = await createPaymentPreference({

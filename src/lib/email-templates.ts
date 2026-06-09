@@ -41,6 +41,51 @@ export function passwordResetEmailTemplate(resetUrl: string, name?: string | nul
   };
 }
 
+export function newRegistrationEmailTemplate(
+  competitionName: string,
+  athleteName: string,
+  categoryName: string,
+  organizerName?: string | null
+) {
+  return {
+    subject: `Nueva inscripción — ${competitionName}`,
+    html: `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body { margin: 0; padding: 0; background-color: #050505; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .container { max-width: 480px; margin: 0 auto; padding: 40px 24px; }
+    .card { background: #111111; border-radius: 16px; padding: 40px 32px; border: 1px solid rgba(255,255,255,0.06); }
+    .logo { width: 48px; height: 48px; background: linear-gradient(135deg, #ff4d00, #ff6b35); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+    .logo span { color: #fff; font-size: 24px; font-weight: 700; }
+    h1 { color: #ffffff; font-size: 22px; font-weight: 700; margin: 0 0 12px; }
+    p { color: #a1a1aa; font-size: 15px; line-height: 1.6; margin: 0 0 16px; }
+    .highlight { color: #ff4d00; font-weight: 600; }
+    .button { display: inline-block; background: linear-gradient(135deg, #ff4d00, #ff6b35); color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 600; }
+    .footer { color: #52525b; font-size: 13px; margin-top: 32px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="logo"><span>W</span></div>
+      <h1>¡Nueva inscripción!</h1>
+      <p>Hola ${escapeHtml(organizerName || "Organizador")},</p>
+      <p><span class="highlight">${escapeHtml(athleteName)}</span> se acaba de inscribir en <strong style="color:#fff;">${escapeHtml(competitionName)}</strong> en la categoría <span class="highlight">${escapeHtml(categoryName)}</span>.</p>
+      <p>Entrá al dashboard para ver todos los detalles.</p>
+      <a href="${process.env.NEXTAUTH_URL}/dashboard" class="button">Ir al dashboard</a>
+      <p class="footer">WODNation — Notificaciones automáticas</p>
+    </div>
+  </div>
+</body>
+</html>
+    `.trim(),
+    text: `Nueva inscripción en ${competitionName}\n\n${athleteName} se inscribió en ${categoryName}.\n\n${process.env.NEXTAUTH_URL}/dashboard`,
+  };
+}
+
 function escapeHtml(text: string): string {
   const map: Record<string, string> = {
     "&": "&amp;",

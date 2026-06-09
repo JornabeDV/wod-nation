@@ -2,13 +2,23 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import { motion } from "framer-motion";
 import { createManualRegistration } from "@/lib/actions";
 import { PageHeader } from "@/components/dashboard/PageHeader";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { toast } from "@/hooks/use-toast";
 import { useI18n } from "@/lib/i18n/provider";
+import {
+  UserPlus,
+  Users,
+  Mail,
+  Phone,
+  Building2,
+  Calendar,
+  Dumbbell,
+  Loader2,
+  CheckCircle2,
+} from "lucide-react";
 
 export default function AthletesPage() {
   const params = useParams();
@@ -50,58 +60,114 @@ export default function AthletesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 max-w-4xl">
       <PageHeader title={d.title} description={d.description} />
 
-      <div className="rounded-xl border border-border bg-surface-raised p-5">
+      {/* Add athlete form */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6"
+      >
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-text-muted mb-5 flex items-center gap-2">
+          <UserPlus size={14} />
+          Registrar atleta manualmente
+        </h2>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
-              <Label htmlFor="name">{d.name}</Label>
-              <Input id="name" name="name" required />
+              <label className="text-sm font-medium text-text-secondary flex items-center gap-1.5">
+                <Users size={12} />
+                {d.name}
+              </label>
+              <input
+                name="name"
+                required
+                className="flex h-10 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 text-sm text-white placeholder:text-text-muted focus:outline-none focus:border-[#ff4d00]/50 focus:ring-1 focus:ring-[#ff4d00]/20 transition-all"
+              />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">{d.email}</Label>
-              <Input id="email" name="email" type="email" />
+              <label className="text-sm font-medium text-text-secondary flex items-center gap-1.5">
+                <Mail size={12} />
+                {d.email}
+              </label>
+              <input
+                name="email"
+                type="email"
+                className="flex h-10 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 text-sm text-white placeholder:text-text-muted focus:outline-none focus:border-[#ff4d00]/50 focus:ring-1 focus:ring-[#ff4d00]/20 transition-all"
+              />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">{d.phone}</Label>
-              <Input id="phone" name="phone" />
+              <label className="text-sm font-medium text-text-secondary flex items-center gap-1.5">
+                <Phone size={12} />
+                {d.phone}
+              </label>
+              <input
+                name="phone"
+                className="flex h-10 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 text-sm text-white placeholder:text-text-muted focus:outline-none focus:border-[#ff4d00]/50 focus:ring-1 focus:ring-[#ff4d00]/20 transition-all"
+              />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="gender">{d.gender}</Label>
-              <select id="gender" name="gender" className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 py-1 text-sm">
+              <label className="text-sm font-medium text-text-secondary">{d.gender}</label>
+              <select
+                name="gender"
+                className="flex h-10 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 text-sm text-white focus:outline-none focus:border-[#ff4d00]/50 transition-all"
+              >
                 <option value="">—</option>
                 <option value="MALE">{t.dashboard.newCompetition.categories.gender.male}</option>
                 <option value="FEMALE">{t.dashboard.newCompetition.categories.gender.female}</option>
               </select>
             </div>
           </div>
+
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
-              <Label htmlFor="categoryId">{d.category}</Label>
+              <label className="text-sm font-medium text-text-secondary flex items-center gap-1.5">
+                <Dumbbell size={12} />
+                {d.category}
+              </label>
               <CategorySelect competitionId={competitionId} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="boxName">{d.boxName}</Label>
-              <Input id="boxName" name="boxName" />
+              <label className="text-sm font-medium text-text-secondary flex items-center gap-1.5">
+                <Building2 size={12} />
+                {d.boxName}
+              </label>
+              <input
+                name="boxName"
+                className="flex h-10 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 text-sm text-white placeholder:text-text-muted focus:outline-none focus:border-[#ff4d00]/50 focus:ring-1 focus:ring-[#ff4d00]/20 transition-all"
+              />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="birthDate">{d.birthDate}</Label>
-              <Input id="birthDate" name="birthDate" type="date" />
+              <label className="text-sm font-medium text-text-secondary flex items-center gap-1.5">
+                <Calendar size={12} />
+                {d.birthDate}
+              </label>
+              <input
+                name="birthDate"
+                type="date"
+                className="flex h-10 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 text-sm text-white focus:outline-none focus:border-[#ff4d00]/50 focus:ring-1 focus:ring-[#ff4d00]/20 transition-all"
+              />
             </div>
           </div>
-          <div className="flex justify-end">
+
+          <div className="flex justify-end pt-2">
             <button
               type="submit"
               disabled={loading}
-              className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-glow transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#ff4d00] to-[#ff6b35] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#ff4d00]/20 transition-all hover:shadow-[#ff4d00]/30 disabled:opacity-50"
             >
+              {loading ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <UserPlus size={16} />
+              )}
               {loading ? d.adding : d.add}
             </button>
           </div>
         </form>
-      </div>
+      </motion.div>
 
       <RegistrationsList competitionId={competitionId} />
     </div>
@@ -119,10 +185,16 @@ function CategorySelect({ competitionId }: { competitionId: string }) {
   }
 
   return (
-    <select id="categoryId" name="categoryId" required className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 py-1 text-sm">
+    <select
+      name="categoryId"
+      required
+      className="flex h-10 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 text-sm text-white focus:outline-none focus:border-[#ff4d00]/50 transition-all"
+    >
       <option value="">{t.dashboard.common.select}</option>
       {categories.map((cat: any) => (
-        <option key={cat.id} value={cat.id}>{cat.name}</option>
+        <option key={cat.id} value={cat.id}>
+          {cat.name}
+        </option>
       ))}
     </select>
   );
@@ -183,36 +255,64 @@ function RegistrationsList({ competitionId }: { competitionId: string }) {
     return () => clearInterval(interval);
   }, [competitionId]);
 
+  if (!loaded) {
+    return (
+      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-12 text-center">
+        <Loader2 size={24} className="animate-spin mx-auto text-text-muted" />
+      </div>
+    );
+  }
+
+  if (regs.length === 0) {
+    return (
+      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-12 text-center">
+        <Users size={32} className="mx-auto mb-3 text-text-muted" />
+        <p className="text-text-secondary">{d.table.empty}</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="rounded-xl border border-border bg-surface-raised overflow-hidden">
-      {!loaded ? (
-        <div className="p-8 text-center text-sm text-text-secondary">{t.dashboard.common.loading}</div>
-      ) : regs.length === 0 ? (
-        <div className="p-8 text-center text-sm text-text-secondary">{d.table.empty}</div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border bg-surface">
-                <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase">{d.table.name}</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase">{d.table.category}</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase">{d.table.payment}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {regs.map((reg: any) => (
-                <tr key={reg.id} className="border-b border-border/50 hover:bg-surface-elevated/50 transition-colors">
-                  <td className="px-4 py-3">{reg.athlete.name}</td>
-                  <td className="px-4 py-3 text-text-secondary">{reg.category.name}</td>
-                  <td className="px-4 py-3">
-                    <StatusBadge status={reg.paymentStatus.toLowerCase() === "paid" || reg.paymentStatus.toLowerCase() === "free" ? "paid" : "pending"} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+    <div className="space-y-3">
+      <h2 className="text-sm font-semibold uppercase tracking-wider text-text-muted mb-4 flex items-center gap-2">
+        <Users size={14} />
+        {regs.length} inscripto{regs.length !== 1 ? "s" : ""}
+      </h2>
+
+      {regs.map((reg, i) => (
+        <motion.div
+          key={reg.id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.03 }}
+          className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 hover:border-white/[0.12] hover:bg-white/[0.04] transition-all"
+        >
+          <div className="flex items-center gap-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#ff4d00]/20 to-[#ff6b35]/10 text-[#ff4d00] font-bold text-sm">
+              {reg.athlete.name.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <div className="font-medium">{reg.athlete.name}</div>
+              <div className="text-xs text-text-secondary flex items-center gap-2 mt-0.5">
+                <span>{reg.category.name}</span>
+                {reg.athlete.boxName && (
+                  <>
+                    <span>·</span>
+                    <span>{reg.athlete.boxName}</span>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+          <StatusBadge
+            status={
+              reg.paymentStatus.toLowerCase() === "paid" || reg.paymentStatus.toLowerCase() === "free"
+                ? "paid"
+                : "pending"
+            }
+          />
+        </motion.div>
+      ))}
     </div>
   );
 }

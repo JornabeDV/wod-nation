@@ -106,6 +106,7 @@ model Competition {
   wods          WOD[]
   registrations Registration[]
   scores        Score[]
+  bracketMatches BracketMatch[]
 }
 
 enum CompetitionStatus {
@@ -130,6 +131,7 @@ model Category {
 
   registrations Registration[]
   scores        Score[]
+  bracketMatches BracketMatch[]
 
   @@unique([competitionId, name])
 }
@@ -161,6 +163,7 @@ model WOD {
   createdAt      DateTime    @default(now())
 
   scores Score[]
+  bracketMatches BracketMatch[]
 }
 
 enum ScoringType {
@@ -185,6 +188,9 @@ model Athlete {
 
   registrations Registration[]
   scores        Score[]
+  athlete1Matches BracketMatch[] @relation("Athlete1Matches")
+  athlete2Matches BracketMatch[] @relation("Athlete2Matches")
+  winnerMatches   BracketMatch[] @relation("WinnerMatches")
 
   @@index([email])
 }
@@ -239,4 +245,29 @@ model Score {
 
   @@unique([wodId, athleteId])
   @@index([competitionId, categoryId, wodId])
+}
+
+model BracketMatch {
+  id            String    @id @default(cuid())
+  competitionId String
+  competition   Competition @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  categoryId    String
+  category      Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  round         Int       // 1 = Round of 16, 2 = Quarter, 3 = Semi, 4 = Final
+  position      Int       // Position within the round (0-indexed)
+  athlete1Id    String?
+  athlete1      Athlete?  @relation("Athlete1Matches", fields: [athlete1Id], references: [id], onDelete: SetNull)
+  athlete2Id    String?
+  athlete2      Athlete?  @relation("Athlete2Matches", fields: [athlete2Id], references: [id], onDelete: SetNull)
+  winnerId      String?
+  winner        Athlete?  @relation("WinnerMatches", fields: [winnerId], references: [id], onDelete: SetNull)
+  score1        String?
+  score2        String?
+  wodId         String?
+  wod           WOD?      @relation(fields: [wodId], references: [id], onDelete: SetNull)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([competitionId, categoryId, round, position])
+  @@index([competitionId, categoryId])
 }
