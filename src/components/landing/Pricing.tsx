@@ -85,7 +85,7 @@ export function Pricing() {
                 </ul>
 
                 <Link
-                  href="/register"
+                  href="/register?role=organizer"
                   className={`block text-center rounded-xl px-4 py-3 text-sm font-semibold transition-all ${
                     plan.highlighted
                       ? "bg-primary text-white hover:bg-primary-glow glow-primary"

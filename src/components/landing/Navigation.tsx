@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
@@ -10,20 +11,22 @@ import { LanguageSwitcher } from "@/components/ui/language/LanguageSwitcher";
 
 export function Navigation() {
   const { data: session } = useSession();
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { scrollY } = useScroll();
   const { t } = useI18n();
+  const registerHref = pathname === "/organize" ? "/register?role=organizer" : "/register";
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setScrolled(latest > 20);
   });
 
   const navLinks = [
+    { href: "/competitions", label: "Competencias" },
+    { href: "/organize", label: "Organizar un evento" },
     { href: "#features", label: t.nav.features },
     { href: "#how-it-works", label: t.nav.howItWorks },
-    { href: "#pricing", label: t.nav.pricing },
-    { href: "#faq", label: t.nav.faq },
   ];
 
   return (
@@ -63,10 +66,10 @@ export function Navigation() {
             <LanguageSwitcher />
             {session ? (
               <Link
-                href="/dashboard"
+                href={(session.user as any)?.role === "ATHLETE" ? "/athlete/dashboard" : "/dashboard"}
                 className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-glow transition-colors"
               >
-                {t.nav.dashboard}
+                {(session.user as any)?.role === "ATHLETE" ? "Mi cuenta" : t.nav.dashboard}
               </Link>
             ) : (
               <>
@@ -77,7 +80,7 @@ export function Navigation() {
                   {t.nav.signIn}
                 </Link>
                 <Link
-                  href="/register"
+                  href={registerHref}
                   className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-glow transition-colors"
                 >
                   {t.nav.getStarted}
@@ -127,7 +130,7 @@ export function Navigation() {
                 {t.nav.signIn}
               </Link>
               <Link
-                href="/register"
+                href={registerHref}
                 className="block text-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white"
                 onClick={() => setMobileOpen(false)}
               >

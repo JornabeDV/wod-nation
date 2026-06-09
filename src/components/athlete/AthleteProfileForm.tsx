@@ -2,19 +2,27 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Loader2, Save, CheckCircle2, User, Phone, Mail, Dumbbell, Users } from "lucide-react";
+import { Loader2, Save, CheckCircle2, User, Phone, Mail, Dumbbell, Users, Calendar } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { DatePicker } from "@/components/ui/date-picker";
 
 export function AthleteProfileForm() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [athlete, setAthlete] = useState<any>(null);
+  const [birthDate, setBirthDate] = useState("");
 
   useEffect(() => {
     fetch("/api/user/athlete-profile")
       .then((r) => r.json())
       .then((data) => {
-        setAthlete(data.athlete || null);
+        const athleteData = data.athlete || null;
+        setAthlete(athleteData);
+        if (athleteData?.birthDate) {
+          const d = new Date(athleteData.birthDate);
+          const formatted = d.toISOString().split("T")[0];
+          setBirthDate(formatted);
+        }
         setLoading(false);
       });
   }, []);
@@ -151,18 +159,14 @@ export function AthleteProfileForm() {
 
         <div className="space-y-2">
           <label className="text-sm font-medium text-text-secondary flex items-center gap-2">
-            <CalendarIcon />
+            <Calendar size={14} className="text-[#ff4d00]" />
             Fecha de nacimiento
           </label>
-          <input
+          <DatePicker
             name="birthDate"
-            type="date"
-            defaultValue={
-              athlete.birthDate
-                ? new Date(athlete.birthDate).toISOString().split("T")[0]
-                : ""
-            }
-            className="flex h-11 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 text-sm text-white placeholder:text-text-muted focus:outline-none focus:border-[#ff4d00]/50 transition-all"
+            value={birthDate}
+            onChange={setBirthDate}
+            placeholder="Seleccionar fecha"
           />
         </div>
       </div>
@@ -185,23 +189,4 @@ export function AthleteProfileForm() {
   );
 }
 
-function CalendarIcon() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="text-[#ff4d00]"
-    >
-      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-      <line x1="16" y1="2" x2="16" y2="6" />
-      <line x1="8" y1="2" x2="8" y2="6" />
-      <line x1="3" y1="10" x2="21" y2="10" />
-    </svg>
-  );
-}
+

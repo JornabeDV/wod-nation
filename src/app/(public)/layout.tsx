@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { UserNav } from "@/components/layout/UserNav";
 
 export default async function PublicLayout({
   children,
@@ -12,7 +13,7 @@ export default async function PublicLayout({
   const userName = session?.user?.name;
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white relative overflow-hidden">
+    <div className="min-h-screen bg-[#050505] text-white relative overflow-hidden flex flex-col">
       {/* Subtle background orbs */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-[#ff4d00]/5 blur-[150px]" />
@@ -76,17 +77,7 @@ export default async function PublicLayout({
 
             <div className="flex items-center gap-4">
               {session ? (
-                <div className="flex items-center gap-3">
-                  <span className="hidden sm:block text-sm text-text-secondary">
-                    {userName}
-                  </span>
-                  <Link
-                    href={role === "ATHLETE" ? "/athlete/dashboard" : "/dashboard"}
-                    className="rounded-lg bg-gradient-to-r from-[#ff4d00] to-[#ff6b35] px-4 py-2 text-sm font-medium text-white shadow-lg shadow-[#ff4d00]/20 hover:shadow-[#ff4d00]/30 transition-all"
-                  >
-                    {role === "ATHLETE" ? "Mi cuenta" : "Dashboard"}
-                  </Link>
-                </div>
+                <UserNav userName={userName} role={role} />
               ) : (
                 <>
                   <Link
@@ -96,7 +87,7 @@ export default async function PublicLayout({
                     Iniciar sesión
                   </Link>
                   <Link
-                    href="/register"
+                    href="/register?role=athlete"
                     className="rounded-lg bg-gradient-to-r from-[#ff4d00] to-[#ff6b35] px-4 py-2 text-sm font-medium text-white shadow-lg shadow-[#ff4d00]/20 hover:shadow-[#ff4d00]/30 transition-all"
                   >
                     Crear cuenta
@@ -109,7 +100,7 @@ export default async function PublicLayout({
       </header>
 
       {/* Main */}
-      <main className="relative z-10">{children}</main>
+      <main className="relative z-10 flex-1">{children}</main>
 
       {/* Footer */}
       <footer className="relative z-10 border-t border-white/[0.06] mt-20">
