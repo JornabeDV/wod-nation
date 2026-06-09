@@ -17,6 +17,7 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [role, setRole] = useState<"ORGANIZER" | "ATHLETE">("ORGANIZER");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -34,6 +35,7 @@ export default function RegisterPage() {
     const email = form.get("email") as string;
     const password = form.get("password") as string;
     const confirmPassword = form.get("confirmPassword") as string;
+    const selectedRole = form.get("role") as "ORGANIZER" | "ATHLETE";
 
     if (password !== confirmPassword) {
       setError("Las contraseñas no coinciden");
@@ -48,7 +50,7 @@ export default function RegisterPage() {
     }
 
     try {
-      await registerUser({ name, email, password });
+      await registerUser({ name, email, password, role: selectedRole });
       router.push("/login?registered=true");
     } catch (err: any) {
       setError(err.message || "Error al registrar");
@@ -62,7 +64,7 @@ export default function RegisterPage() {
 
       <AuthCard
         title="Crear cuenta"
-        subtitle="Unite a WODNation y empezá a organizar competencias"
+        subtitle="Unite a WODNation como organizador o atleta"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <AuthInput
@@ -100,6 +102,35 @@ export default function RegisterPage() {
             required
             autoComplete="new-password"
           />
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-text-secondary">Tipo de cuenta</label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setRole("ORGANIZER")}
+                className={`rounded-xl border px-4 py-3 text-sm font-medium transition-all ${
+                  role === "ORGANIZER"
+                    ? "border-[#ff4d00]/50 bg-[#ff4d00]/10 text-white"
+                    : "border-white/[0.08] bg-white/[0.03] text-text-secondary hover:text-white"
+                }`}
+              >
+                Organizador
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole("ATHLETE")}
+                className={`rounded-xl border px-4 py-3 text-sm font-medium transition-all ${
+                  role === "ATHLETE"
+                    ? "border-[#ff4d00]/50 bg-[#ff4d00]/10 text-white"
+                    : "border-white/[0.08] bg-white/[0.03] text-text-secondary hover:text-white"
+                }`}
+              >
+                Atleta
+              </button>
+            </div>
+            <input type="hidden" name="role" value={role} />
+          </div>
 
           <label className="flex items-start gap-3 text-sm text-text-secondary cursor-pointer">
             <input

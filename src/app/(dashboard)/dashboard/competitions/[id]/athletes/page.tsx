@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { DatePicker } from "@/components/ui/date-picker";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { createManualRegistration } from "@/lib/actions";
@@ -24,6 +25,7 @@ export default function AthletesPage() {
   const params = useParams();
   const competitionId = params.id as string;
   const [loading, setLoading] = useState(false);
+  const [birthDate, setBirthDate] = useState("");
   const { t } = useI18n();
   const d = t.dashboard.athletesPage;
 
@@ -49,6 +51,7 @@ export default function AthletesPage() {
         variant: "success",
       });
       (e.target as HTMLFormElement).reset();
+      setBirthDate("");
     } catch (err) {
       toast({
         title: d.toast.errorTitle,
@@ -144,10 +147,12 @@ export default function AthletesPage() {
                 <Calendar size={12} />
                 {d.birthDate}
               </label>
-              <input
+              <DatePicker
                 name="birthDate"
-                type="date"
-                className="flex h-10 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 text-sm text-white focus:outline-none focus:border-[#ff4d00]/50 focus:ring-1 focus:ring-[#ff4d00]/20 transition-all"
+                value={birthDate}
+                onChange={setBirthDate}
+                className="h-10"
+                placeholder="Seleccionar fecha"
               />
             </div>
           </div>

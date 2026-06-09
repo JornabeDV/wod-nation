@@ -64,6 +64,7 @@ model User {
 enum UserRole {
   ORGANIZER
   ADMIN
+  ATHLETE
 }
 
 // ── Application tables ──

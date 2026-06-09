@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DatePicker } from "@/components/ui/date-picker";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -26,6 +27,7 @@ export default function RegisterPage() {
   const slug = params.slug as string;
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [birthDate, setBirthDate] = useState("");
   const [categories, setCategories] = useState<any[]>([]);
   const [competition, setCompetition] = useState<any>(null);
 
@@ -254,10 +256,11 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-text-secondary">Fecha de nacimiento</label>
-              <input
+              <DatePicker
                 name="birthDate"
-                type="date"
-                className="flex h-11 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 text-sm text-white focus:outline-none focus:border-[#ff4d00]/50 focus:ring-1 focus:ring-[#ff4d00]/20 transition-all"
+                value={birthDate}
+                onChange={setBirthDate}
+                placeholder="Seleccionar fecha"
               />
             </div>
 

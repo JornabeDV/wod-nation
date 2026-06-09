@@ -79,6 +79,7 @@ export function CompetitionsListView({ competitions }: CompetitionsListViewProps
       ) : (
         <AnimatedTable
           data={formattedCompetitions}
+          onRowClick={(row) => router.push(`/dashboard/competitions/${row.id}`)}
           columns={[
             {
               key: "name",
@@ -148,6 +149,7 @@ export function CompetitionsListView({ competitions }: CompetitionsListViewProps
                   </button>
                   <Link
                     href={`/dashboard/competitions/${row.id}`}
+                    onClick={(e) => e.stopPropagation()}
                     className="inline-flex p-2 rounded-lg hover:bg-surface-elevated text-text-muted hover:text-text transition-colors"
                   >
                     <ArrowRight size={16} />

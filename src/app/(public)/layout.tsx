@@ -1,10 +1,16 @@
 import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-export default function PublicLayout({
+export default async function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getServerSession(authOptions);
+  const role = (session?.user as any)?.role;
+  const userName = session?.user?.name;
+
   return (
     <div className="min-h-screen bg-[#050505] text-white relative overflow-hidden">
       {/* Subtle background orbs */}
@@ -34,19 +40,69 @@ export default function PublicLayout({
               </div>
               <span className="text-gradient-primary">WODNation</span>
             </Link>
-            <div className="flex items-center gap-4">
+
+            <nav className="hidden sm:flex items-center gap-6">
               <Link
-                href="/login"
+                href="/competitions"
                 className="text-sm text-text-secondary hover:text-white transition-colors"
               >
-                Iniciar sesión
+                Competencias
               </Link>
-              <Link
-                href="/register"
-                className="rounded-lg bg-gradient-to-r from-[#ff4d00] to-[#ff6b35] px-4 py-2 text-sm font-medium text-white shadow-lg shadow-[#ff4d00]/20 hover:shadow-[#ff4d00]/30 transition-all"
-              >
-                Crear cuenta
-              </Link>
+              {role === "ORGANIZER" || role === "ADMIN" ? (
+                <Link
+                  href="/dashboard"
+                  className="text-sm text-text-secondary hover:text-white transition-colors"
+                >
+                  Dashboard
+                </Link>
+              ) : null}
+              {role === "ATHLETE" ? (
+                <>
+                  <Link
+                    href="/athlete/dashboard"
+                    className="text-sm text-text-secondary hover:text-white transition-colors"
+                  >
+                    Mis competencias
+                  </Link>
+                  <Link
+                    href="/athlete/profile"
+                    className="text-sm text-text-secondary hover:text-white transition-colors"
+                  >
+                    Perfil
+                  </Link>
+                </>
+              ) : null}
+            </nav>
+
+            <div className="flex items-center gap-4">
+              {session ? (
+                <div className="flex items-center gap-3">
+                  <span className="hidden sm:block text-sm text-text-secondary">
+                    {userName}
+                  </span>
+                  <Link
+                    href={role === "ATHLETE" ? "/athlete/dashboard" : "/dashboard"}
+                    className="rounded-lg bg-gradient-to-r from-[#ff4d00] to-[#ff6b35] px-4 py-2 text-sm font-medium text-white shadow-lg shadow-[#ff4d00]/20 hover:shadow-[#ff4d00]/30 transition-all"
+                  >
+                    {role === "ATHLETE" ? "Mi cuenta" : "Dashboard"}
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="text-sm text-text-secondary hover:text-white transition-colors"
+                  >
+                    Iniciar sesión
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="rounded-lg bg-gradient-to-r from-[#ff4d00] to-[#ff6b35] px-4 py-2 text-sm font-medium text-white shadow-lg shadow-[#ff4d00]/20 hover:shadow-[#ff4d00]/30 transition-all"
+                  >
+                    Crear cuenta
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

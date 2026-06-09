@@ -22,6 +22,7 @@ export async function registerUser(data: {
   name: string;
   email: string;
   password: string;
+  role?: "ORGANIZER" | "ATHLETE";
 }) {
   const existing = await db.user.findUnique({
     where: { email: data.email },
@@ -32,18 +33,30 @@ export async function registerUser(data: {
   }
 
   const hashedPassword = await bcrypt.hash(data.password, 12);
+  const role = data.role === "ATHLETE" ? "ATHLETE" : "ORGANIZER";
 
   const user = await db.user.create({
     data: {
       name: data.name,
       email: data.email,
       password: hashedPassword,
+      role,
     },
   });
 
-  await db.organizerProfile.create({
-    data: { userId: user.id },
-  });
+  if (role === "ORGANIZER") {
+    await db.organizerProfile.create({
+      data: { userId: user.id },
+    });
+  } else {
+    await db.athlete.create({
+      data: {
+        userId: user.id,
+        name: data.name,
+        email: data.email,
+      },
+    });
+  }
 
   return { success: true, userId: user.id };
 }
@@ -163,6 +176,32 @@ export async function createCategory(data: {
 export async function deleteCategory(id: string, competitionId: string) {
   await db.category.delete({ where: { id } });
   revalidatePath(`/dashboard/competitions/${competitionId}/categories`);
+}
+
+export async function updateCategory(
+  id: string,
+  data: {
+    name?: string;
+    gender?: string;
+    divisionType?: string;
+    minAge?: number;
+    maxAge?: number;
+    maxAthletes?: number | null;
+  }
+) {
+  const category = await db.category.update({
+    where: { id },
+    data: {
+      name: data.name,
+      gender: data.gender as any,
+      divisionType: data.divisionType as any,
+      minAge: data.minAge,
+      maxAge: data.maxAge,
+      maxAthletes: data.maxAthletes,
+    },
+  });
+  revalidatePath(`/dashboard/competitions/${category.competitionId}/categories`);
+  return category;
 }
 
 export async function createWOD(data: {
