@@ -28,7 +28,7 @@ export function OrganizerCTA() {
             Unite a más de 50 boxes que ya usan WODNation. Empezá gratis y upgradeá cuando lo necesites.
           </p>
           <Link
-            href="/register?role=organizer"
+            href="/register"
             className="group inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-semibold text-white transition-all hover:bg-primary-glow glow-primary"
           >
             Crear mi primera competencia

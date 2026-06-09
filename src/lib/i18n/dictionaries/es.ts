@@ -6,7 +6,7 @@ export const dictionary = {
     faq: "Preguntas",
     signIn: "Iniciar sesión",
     getStarted: "Empezar",
-    dashboard: "Panel",
+    dashboard: "Panel general",
   },
   hero: {
     badge: "En vivo — Box Battle 2026",
@@ -240,10 +240,10 @@ export const dictionary = {
   },
   dashboard: {
     sidebar: {
-      dashboard: "Panel",
+      dashboard: "Panel general",
       competitions: "Competencias",
-      newCompetition: "Nueva competencia",
-      settings: "Configuración",
+      newCompetition: "Crear competencia",
+      settings: "Perfil",
       signOut: "Cerrar sesión",
     },
     header: {
@@ -255,7 +255,7 @@ export const dictionary = {
       back: "Volver",
     },
     home: {
-      title: "Panel",
+      title: "Panel general",
       welcome: "Bienvenido de nuevo, {name}",
       stats: {
         totalCompetitions: "Competencias totales",
@@ -288,8 +288,8 @@ export const dictionary = {
       },
     },
     competitions: {
-      title: "Competencias",
-      description: "Administra todas tus competencias desde un solo lugar.",
+      title: "Mis competencias",
+      description: "Administrá todas tus competencias desde un solo lugar.",
       newButton: "Nueva competencia",
       empty: {
         title: "Aún no hay competencias",

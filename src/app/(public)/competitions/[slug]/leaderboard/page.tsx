@@ -11,12 +11,11 @@ import {
   Medal,
   Award,
   Clock,
-  Gavel,
+
   Radio,
   RefreshCw,
 } from "lucide-react";
 import { LeaderboardExport } from "@/components/leaderboard/LeaderboardExport";
-import { CertificateGenerator } from "@/components/certificates/CertificateGenerator";
 import Link from "next/link";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -45,25 +44,25 @@ function PodiumPlace({
       transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
       className="flex flex-col items-center"
     >
-      <div className="mb-3 relative">
+      <div className="mb-2 sm:mb-3 relative">
         <div
-          className={`h-16 w-16 rounded-full ${color} flex items-center justify-center text-2xl font-bold shadow-lg`}
+          className={`h-12 w-12 sm:h-16 sm:w-16 rounded-full ${color} flex items-center justify-center text-xl sm:text-2xl font-bold shadow-lg`}
         >
           {rank === 1 ? (
-            <Trophy size={28} />
+            <Trophy size={20} className="sm:w-[28px] sm:h-[28px]" />
           ) : rank === 2 ? (
-            <Medal size={24} />
+            <Medal size={18} className="sm:w-[24px] sm:h-[24px]" />
           ) : (
-            <Award size={24} />
+            <Award size={18} className="sm:w-[24px] sm:h-[24px]" />
           )}
         </div>
-        <div className="absolute -top-1 -right-1 h-6 w-6 rounded-full bg-surface-raised border border-border flex items-center justify-center text-xs font-bold">
+        <div className="absolute -top-1 -right-1 h-5 w-5 sm:h-6 sm:w-6 rounded-full bg-surface-raised border border-border flex items-center justify-center text-[10px] sm:text-xs font-bold">
           {rank}
         </div>
       </div>
-      <div className="text-center mb-2">
-        <div className="font-semibold text-sm truncate max-w-[120px]">{name}</div>
-        <div className="text-xs text-text-muted truncate max-w-[120px]">
+      <div className="text-center mb-1 sm:mb-2 px-1">
+        <div className="font-semibold text-xs sm:text-sm truncate max-w-[80px] sm:max-w-[120px]">{name}</div>
+        <div className="text-[10px] sm:text-xs text-text-muted truncate max-w-[80px] sm:max-w-[120px]">
           {box || "—"}
         </div>
       </div>
@@ -71,9 +70,9 @@ function PodiumPlace({
         initial={{ height: 0 }}
         animate={{ height }}
         transition={{ duration: 0.8, delay: delay + 0.2, ease: [0.22, 1, 0.36, 1] }}
-        className={`w-24 ${color} rounded-t-lg flex items-end justify-center pb-3`}
+        className={`w-16 sm:w-24 ${color} rounded-t-lg flex items-end justify-center pb-2 sm:pb-3`}
       >
-        <span className="text-sm font-bold">{points} pts</span>
+        <span className="text-xs sm:text-sm font-bold">{points} pts</span>
       </motion.div>
     </motion.div>
   );
@@ -233,10 +232,10 @@ export default function LeaderboardPage() {
                 Live Leaderboard
               </motion.p>
             </div>
-            <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
               <LiveIndicator isConnected={sseConnected} isRefreshing={isRefreshing} />
-              <div className="flex items-center gap-2 text-xs text-text-muted">
-                <Clock size={14} />
+              <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-text-muted">
+                <Clock size={12} className="sm:w-[14px] sm:h-[14px]" />
                 {lastUpdated.toLocaleTimeString()}
               </div>
               <LeaderboardExport
@@ -246,24 +245,18 @@ export default function LeaderboardPage() {
                 }
                 leaderboardData={leaderboard}
               />
-              <Link
-                href={`/competitions/${slug}/judge`}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm text-text-secondary hover:text-text hover:border-border-hover transition-colors"
-              >
-                <Gavel size={14} />
-                Judge
-              </Link>
+
               <button
                 onClick={toggleFullscreen}
-                className="p-2 rounded-lg hover:bg-surface-raised text-text-muted hover:text-text transition-colors"
+                className="p-1.5 sm:p-2 rounded-lg hover:bg-surface-raised text-text-muted hover:text-text transition-colors"
               >
-                {fullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+                {fullscreen ? <Minimize2 size={16} className="sm:w-[18px] sm:h-[18px]" /> : <Maximize2 size={16} className="sm:w-[18px] sm:h-[18px]" />}
               </button>
             </div>
           </div>
 
           {/* Category Tabs */}
-          <div className="flex gap-2 overflow-x-auto pb-2">
+          <div className="flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
             {competition.categories.map((cat: any, i: number) => (
               <motion.button
                 key={cat.id}
@@ -271,7 +264,7 @@ export default function LeaderboardPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
                 onClick={() => setCategoryId(cat.id)}
-                className={`whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                className={`flex-shrink-0 snap-start whitespace-nowrap rounded-lg px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm font-medium transition-all ${
                   categoryId === cat.id
                     ? "bg-primary text-white"
                     : "bg-surface-raised text-text-secondary hover:text-text border border-border hover:border-border-hover"
@@ -299,7 +292,7 @@ export default function LeaderboardPage() {
       <div className="mx-auto max-w-6xl px-4 py-8">
         {/* Podium */}
         {leaderboard && top3.length > 0 && (
-          <div className="flex items-end justify-center gap-4 sm:gap-8 mb-10 print:hidden">
+          <div className="flex items-end justify-center gap-2 sm:gap-4 md:gap-8 mb-10 print:hidden">
             {top3[1] && (
               <PodiumPlace
                 rank={2}
@@ -343,27 +336,26 @@ export default function LeaderboardPage() {
               <table className="w-full text-sm print:text-black">
                 <thead>
                   <tr className="border-b border-border bg-surface print:bg-gray-100 print:border-gray-300">
-                    <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase w-16 print:text-gray-600">
+                    <th className="px-2 py-2 sm:px-4 sm:py-3 text-left text-[10px] sm:text-xs font-medium text-text-muted uppercase w-12 sm:w-16 print:text-gray-600">
                       #
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase print:text-gray-600">
+                    <th className="px-2 py-2 sm:px-4 sm:py-3 text-left text-[10px] sm:text-xs font-medium text-text-muted uppercase print:text-gray-600">
                       Athlete
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-text-muted uppercase print:text-gray-600">
+                    <th className="hidden sm:table-cell px-2 py-2 sm:px-4 sm:py-3 text-left text-[10px] sm:text-xs font-medium text-text-muted uppercase print:text-gray-600">
                       Box
                     </th>
                     {leaderboard.wods.map((wod: any) => (
                       <th
                         key={wod.id}
-                        className="px-4 py-3 text-center text-xs font-medium text-text-muted uppercase print:text-gray-600"
+                        className="px-2 py-2 sm:px-4 sm:py-3 text-center text-[10px] sm:text-xs font-medium text-text-muted uppercase print:text-gray-600"
                       >
                         {wod.name}
                       </th>
                     ))}
-                    <th className="px-4 py-3 text-center text-xs font-medium text-text-muted uppercase print:text-gray-600">
+                    <th className="px-2 py-2 sm:px-4 sm:py-3 text-center text-[10px] sm:text-xs font-medium text-text-muted uppercase print:text-gray-600">
                       Total
                     </th>
-                    <th className="px-4 py-3 text-xs font-medium text-text-muted uppercase print:hidden w-24"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -378,9 +370,9 @@ export default function LeaderboardPage() {
                         transition={{ duration: 0.3, delay: i * 0.02 }}
                         className="border-b border-border/50 hover:bg-surface-elevated/30 transition-colors print:border-gray-200 print:hover:bg-transparent"
                       >
-                        <td className="px-4 py-3">
+                        <td className="px-2 py-2 sm:px-4 sm:py-3">
                           <span
-                            className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
+                            className={`inline-flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full text-[10px] sm:text-xs font-bold ${
                               row.overallRank === 1
                                 ? "bg-yellow-500/20 text-yellow-400 print:bg-yellow-100 print:text-yellow-700"
                                 : row.overallRank === 2
@@ -393,29 +385,20 @@ export default function LeaderboardPage() {
                             {row.overallRank}
                           </span>
                         </td>
-                        <td className="px-4 py-3 font-medium">{row.athleteName}</td>
-                        <td className="px-4 py-3 text-text-secondary print:text-gray-600">
+                        <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm font-medium">{row.athleteName}</td>
+                        <td className="hidden sm:table-cell px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm text-text-secondary print:text-gray-600">
                           {row.boxName || "—"}
                         </td>
                         {row.wodScores.map((ws: any) => (
-                          <td key={ws.wodId} className="px-4 py-3 text-center">
+                          <td key={ws.wodId} className="px-2 py-2 sm:px-4 sm:py-3 text-center text-xs sm:text-sm">
                             <div>{ws.rawScore}</div>
-                            <div className="text-xs text-text-muted print:text-gray-500">
+                            <div className="text-[10px] sm:text-xs text-text-muted print:text-gray-500">
                               ({ws.points} pts)
                             </div>
                           </td>
                         ))}
-                        <td className="px-4 py-3 text-center font-bold">
+                        <td className="px-2 py-2 sm:px-4 sm:py-3 text-center text-xs sm:text-sm font-bold">
                           {row.totalPoints}
-                        </td>
-                        <td className="px-4 py-3 print:hidden">
-                          <CertificateGenerator
-                            athleteName={row.athleteName}
-                            competitionName={competition.name}
-                            categoryName={competition.categories.find((c: any) => c.id === categoryId)?.name}
-                            date={new Date(competition.startDate).toLocaleDateString("es-AR")}
-                            rank={row.overallRank}
-                          />
                         </td>
                       </motion.tr>
                     ))}

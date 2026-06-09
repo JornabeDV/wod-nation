@@ -4,10 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
-  LayoutDashboard,
   Trophy,
-  PlusCircle,
-  Settings,
+  User,
+  CalendarDays,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -24,10 +23,9 @@ export function Sidebar() {
   const { t } = useI18n();
 
   const navItems = [
-    { label: t.dashboard.sidebar.dashboard, href: "/dashboard", icon: LayoutDashboard },
-    { label: t.dashboard.sidebar.competitions, href: "/dashboard/competitions", icon: Trophy },
-    { label: t.dashboard.sidebar.newCompetition, href: "/dashboard/competitions/new", icon: PlusCircle },
-    { label: t.dashboard.sidebar.settings, href: "/dashboard/profile", icon: Settings },
+    { label: "Mi perfil", href: "/dashboard/profile", icon: User },
+    { label: "Mis competencias", href: "/dashboard/competitions", icon: Trophy },
+    { label: "Mis inscripciones", href: "/dashboard/registrations", icon: CalendarDays },
   ];
 
   return (

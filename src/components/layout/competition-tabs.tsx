@@ -11,6 +11,7 @@ import {
   PenTool,
   Settings,
   Swords,
+
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n/provider";
 
@@ -21,6 +22,7 @@ const tabIcons = {
   athletes: Users,
   scores: PenTool,
   brackets: Swords,
+
   settings: Settings,
 };
 
@@ -36,6 +38,7 @@ export function CompetitionTabs({ competitionId }: { competitionId: string }) {
     { key: "athletes", label: d.athletes, href: "/athletes" },
     { key: "scores", label: d.scores, href: "/scores" },
     { key: "brackets", label: d.brackets || "Brackets", href: "/brackets" },
+
     { key: "settings", label: d.settings, href: "/settings" },
   ] as const;
 

@@ -22,7 +22,6 @@ export async function registerUser(data: {
   name: string;
   email: string;
   password: string;
-  role?: "ORGANIZER" | "ATHLETE";
 }) {
   const existing = await db.user.findUnique({
     where: { email: data.email },
@@ -33,30 +32,27 @@ export async function registerUser(data: {
   }
 
   const hashedPassword = await bcrypt.hash(data.password, 12);
-  const role = data.role === "ATHLETE" ? "ATHLETE" : "ORGANIZER";
 
   const user = await db.user.create({
     data: {
       name: data.name,
       email: data.email,
       password: hashedPassword,
-      role,
+      role: "USER",
     },
   });
 
-  if (role === "ORGANIZER") {
-    await db.organizerProfile.create({
-      data: { userId: user.id },
-    });
-  } else {
-    await db.athlete.create({
-      data: {
-        userId: user.id,
-        name: data.name,
-        email: data.email,
-      },
-    });
-  }
+  await db.organizerProfile.create({
+    data: { userId: user.id },
+  });
+
+  await db.athlete.create({
+    data: {
+      userId: user.id,
+      name: data.name,
+      email: data.email,
+    },
+  });
 
   return { success: true, userId: user.id };
 }

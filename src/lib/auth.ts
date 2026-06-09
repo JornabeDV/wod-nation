@@ -44,7 +44,6 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role,
         };
       },
     }),
@@ -56,12 +55,22 @@ export const authOptions: NextAuthOptions = {
           where: { email: user.email! },
         });
         if (!existing) {
-          await db.user.create({
+          const newUser = await db.user.create({
             data: {
               email: user.email!,
               name: user.name,
               image: user.image,
-              role: "ATHLETE",
+              role: "USER",
+            },
+          });
+          await db.organizerProfile.create({
+            data: { userId: newUser.id },
+          });
+          await db.athlete.create({
+            data: {
+              userId: newUser.id,
+              name: user.name || "Sin nombre",
+              email: user.email!,
             },
           });
         }
@@ -71,16 +80,14 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
-        token.role = user.role;
       }
       if (account?.provider === "google" && token.email) {
         const dbUser = await db.user.findUnique({
           where: { email: token.email },
-          select: { id: true, role: true },
+          select: { id: true },
         });
         if (dbUser) {
           token.id = dbUser.id;
-          token.role = dbUser.role;
         }
       }
       return token;
@@ -88,7 +95,6 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token && session.user) {
         (session.user as any).id = token.id;
-        (session.user as any).role = token.role;
       }
       return session;
     },

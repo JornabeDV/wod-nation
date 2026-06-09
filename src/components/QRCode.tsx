@@ -11,14 +11,14 @@ interface QRCodeProps {
   size?: number;
 }
 
-export function QRCodeButton({ url, label = "Compartir QR" }: { url: string; label?: string }) {
+export function QRCodeButton({ url, label = "Compartir QR", className }: { url: string; label?: string; className?: string }) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm text-text-secondary hover:text-text hover:border-border-hover transition-colors"
+        className={className || "inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm text-text-secondary hover:text-text hover:border-border-hover transition-colors"}
       >
         <Share2 size={14} />
         {label}

@@ -12,7 +12,6 @@ export async function POST(req: NextRequest) {
     const { slug, name, email, phone, gender, birthDate, boxName, categoryId } = body;
 
     const session = await getServerSession(authOptions);
-    const isAthleteUser = (session?.user as any)?.role === "ATHLETE";
 
     const competition = await db.competition.findUnique({ where: { slug } });
     if (!competition) {
@@ -38,7 +37,7 @@ export async function POST(req: NextRequest) {
 
     let athleteId: string;
 
-    if (isAthleteUser && session?.user?.id) {
+    if (session?.user?.id) {
       // Try to find existing athlete for this user
       const existingAthlete = await db.athlete.findUnique({
         where: { userId: session.user.id },
@@ -75,7 +74,7 @@ export async function POST(req: NextRequest) {
         athleteId = newAthlete.id;
       }
     } else {
-      // Anonymous registration
+      // Anonymous registration (fallback)
       const athlete = await db.athlete.create({
         data: {
           name,

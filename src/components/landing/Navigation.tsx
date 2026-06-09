@@ -16,7 +16,7 @@ export function Navigation() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { scrollY } = useScroll();
   const { t } = useI18n();
-  const registerHref = pathname === "/organize" ? "/register?role=organizer" : "/register";
+  const registerHref = "/register";
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setScrolled(latest > 20);
@@ -66,10 +66,10 @@ export function Navigation() {
             <LanguageSwitcher />
             {session ? (
               <Link
-                href={(session.user as any)?.role === "ATHLETE" ? "/athlete/dashboard" : "/dashboard"}
+                href="/dashboard"
                 className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-glow transition-colors"
               >
-                {(session.user as any)?.role === "ATHLETE" ? "Mi cuenta" : t.nav.dashboard}
+                {t.nav.dashboard}
               </Link>
             ) : (
               <>

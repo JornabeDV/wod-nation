@@ -124,7 +124,7 @@ export function CompetitionOverviewView({ competition }: CompetitionOverviewView
         <div className="space-y-3">
           <LinkRow url={publicUrl} label={d.publicLinks.open} />
           <LinkRow url={`${publicUrl}/leaderboard`} label={d.publicLinks.leaderboard} />
-          <LinkRow url={`${publicUrl}/judge`} label={d.publicLinks.judge} />
+
         </div>
       </div>
 

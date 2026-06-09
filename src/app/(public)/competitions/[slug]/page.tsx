@@ -10,7 +10,7 @@ import {
   Clock,
   Dumbbell,
   ChevronRight,
-  Gavel,
+
   Swords,
   Radio,
   CheckCircle2,
@@ -65,7 +65,6 @@ export default async function PublicCompetitionPage({
   const isFree = competition.registrationFee === 0;
   const registrationUrl = `/competitions/${competition.slug}/register`;
   const leaderboardUrl = `/competitions/${competition.slug}/leaderboard`;
-  const judgeUrl = `/competitions/${competition.slug}/judge`;
   const bracketsUrl = `/competitions/${competition.slug}/brackets`;
   const publicUrl = `${process.env.NEXTAUTH_URL}/competitions/${competition.slug}`;
 
@@ -176,15 +175,11 @@ export default async function PublicCompetitionPage({
               Eliminatorias
             </Link>
 
-            <Link
-              href={judgeUrl}
-              className="inline-flex items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] px-6 py-3.5 text-sm font-medium text-white transition-all hover:bg-white/[0.06] hover:border-white/[0.12]"
-            >
-              <Gavel size={16} />
-              Modo Juez
-            </Link>
-
-            <QRCodeButton url={`${publicUrl}/register`} label="QR" />
+            <QRCodeButton
+              url={`${publicUrl}/register`}
+              label="QR"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] px-6 py-3.5 text-sm font-medium text-white transition-all hover:bg-white/[0.06] hover:border-white/[0.12] cursor-pointer"
+            />
           </div>
         </div>
       </div>

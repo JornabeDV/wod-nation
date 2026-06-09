@@ -13,12 +13,10 @@ import { User, LayoutDashboard, LogOut } from "lucide-react";
 
 interface UserNavProps {
   userName?: string | null;
-  role?: string;
 }
 
-export function UserNav({ userName, role }: UserNavProps) {
-  const isAthlete = role === "ATHLETE";
-  const dashboardHref = isAthlete ? "/athlete/dashboard" : "/dashboard";
+export function UserNav({ userName }: UserNavProps) {
+  const dashboardHref = "/dashboard";
 
   return (
     <div className="flex items-center gap-3">
@@ -32,7 +30,7 @@ export function UserNav({ userName, role }: UserNavProps) {
             type="button"
             className="rounded-lg bg-gradient-to-r from-[#ff4d00] to-[#ff6b35] px-4 py-2 text-sm font-medium text-white shadow-lg shadow-[#ff4d00]/20 hover:shadow-[#ff4d00]/30 transition-all"
           >
-            {isAthlete ? "Mi cuenta" : "Dashboard"}
+            Dashboard
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
@@ -45,21 +43,19 @@ export function UserNav({ userName, role }: UserNavProps) {
               className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-text hover:bg-surface-elevated cursor-pointer"
             >
               <LayoutDashboard size={14} />
-              {isAthlete ? "Mi cuenta" : "Dashboard"}
+              Dashboard
             </Link>
           </DropdownMenuItem>
 
-          {isAthlete && (
-            <DropdownMenuItem asChild>
-              <Link
-                href="/athlete/profile"
-                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-text hover:bg-surface-elevated cursor-pointer"
-              >
-                <User size={14} />
-                Perfil
-              </Link>
-            </DropdownMenuItem>
-          )}
+          <DropdownMenuItem asChild>
+            <Link
+              href="/dashboard/profile"
+              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-text hover:bg-surface-elevated cursor-pointer"
+            >
+              <User size={14} />
+              Perfil
+            </Link>
+          </DropdownMenuItem>
 
           <DropdownMenuSeparator className="my-1 bg-white/[0.06]" />
 

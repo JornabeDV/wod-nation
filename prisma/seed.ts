@@ -62,19 +62,26 @@ async function main() {
       { name: "Demo Organizer", email: "demo@wodnation.com", boxName: "CrossFit Mendoza", phone: "+54 9 261 555-5555" },
       { name: "Carla Romero", email: "carla@fitbox.com", boxName: "FitBox Córdoba", phone: "+54 9 351 666-7777" },
       { name: "Diego Fernández", email: "diego@crossba.com", boxName: "CrossFit Buenos Aires", phone: "+54 9 11 4444-3333" },
-    ].map((o) =>
+    ].map((o, i) =>
       db.user.create({
         data: {
           name: o.name,
           email: o.email,
           password: hashedPassword,
-          role: "ORGANIZER",
+          role: i === 0 ? "ADMIN" : "USER",
           organizerProfile: {
             create: {
               boxName: o.boxName,
               phone: o.phone,
               bio: `Organizador profesional de competencias en ${o.boxName}.`,
               hasCompletedOnboarding: true,
+            },
+          },
+          athlete: {
+            create: {
+              name: o.name,
+              email: o.email,
+              boxName: o.boxName,
             },
           },
         },

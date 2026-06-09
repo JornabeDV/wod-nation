@@ -103,19 +103,19 @@ export function LeaderboardExport({
 
   return (
     <>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5 sm:gap-2">
         <button
           onClick={exportCSV}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm text-text-secondary hover:text-text hover:border-border-hover transition-colors"
+          className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm text-text-secondary hover:text-text hover:border-border-hover transition-colors"
         >
-          <FileSpreadsheet size={14} />
+          <FileSpreadsheet size={12} className="sm:w-[14px] sm:h-[14px]" />
           CSV
         </button>
         <button
           onClick={exportPDF}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm text-text-secondary hover:text-text hover:border-border-hover transition-colors"
+          className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm text-text-secondary hover:text-text hover:border-border-hover transition-colors"
         >
-          <FileText size={14} />
+          <FileText size={12} className="sm:w-[14px] sm:h-[14px]" />
           PDF
         </button>
       </div>

@@ -103,7 +103,7 @@ export function OrganizerHero() {
           className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
         >
           <Link
-            href="/register?role=organizer"
+            href="/register"
             className="group relative inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-semibold text-white transition-all hover:bg-primary-glow glow-primary"
           >
             Empezar gratis

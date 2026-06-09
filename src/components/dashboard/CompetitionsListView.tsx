@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { PageHeader } from "@/components/dashboard/PageHeader";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { AnimatedTable } from "@/components/dashboard/AnimatedTable";
 import { PlusCircle, ArrowRight, Trophy, Copy } from "lucide-react";
@@ -41,39 +40,24 @@ export function CompetitionsListView({ competitions }: CompetitionsListViewProps
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={t.dashboard.competitions.title}
-        description={t.dashboard.competitions.description}
-        actions={
-          <Link
-            href="/dashboard/competitions/new"
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#ff4d00] to-[#ff6b35] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#ff4d00]/20 hover:shadow-[#ff4d00]/30 transition-all"
-          >
-            <PlusCircle size={16} />
-            {t.dashboard.competitions.newButton}
-          </Link>
-        }
-      />
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">{t.dashboard.competitions.title}</h1>
+        <p className="text-text-secondary mt-1">{t.dashboard.competitions.description}</p>
+      </div>
 
       {formattedCompetitions.length === 0 ? (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-16 text-center"
+          className="text-center py-16 text-text-muted"
         >
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#ff4d00]/10 text-[#ff4d00] mb-4">
-            <Trophy size={28} />
-          </div>
-          <h3 className="text-lg font-semibold mb-2">{t.dashboard.competitions.empty.title}</h3>
-          <p className="text-text-secondary mb-6 max-w-md mx-auto">
-            {t.dashboard.competitions.empty.description}
-          </p>
+          <Trophy size={48} className="mx-auto mb-4 opacity-30" />
+          <p className="text-lg mb-2">{t.dashboard.competitions.empty.title}</p>
           <Link
             href="/dashboard/competitions/new"
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#ff4d00] to-[#ff6b35] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#ff4d00]/20 hover:shadow-[#ff4d00]/30 transition-all"
+            className="inline-flex items-center gap-2 text-primary hover:underline"
           >
-            <PlusCircle size={16} />
-            {t.dashboard.competitions.empty.cta}
+            {t.dashboard.competitions.empty.cta} <ArrowRight size={16} />
           </Link>
         </motion.div>
       ) : (

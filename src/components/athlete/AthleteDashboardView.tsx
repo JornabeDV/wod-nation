@@ -48,24 +48,26 @@ export function AthleteDashboardView() {
 
   return (
     <div className="space-y-10">
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard
-          label="Competencias"
-          value={registrations.length}
-          icon={Trophy}
-        />
-        <StatCard
-          label="Próximas"
-          value={upcoming.length}
-          icon={Calendar}
-        />
-        <StatCard
-          label="Finalizadas"
-          value={finished.length}
-          icon={CheckCircle2}
-        />
-      </div>
+      {/* Stats — solo cuando hay inscripciones */}
+      {registrations.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <StatCard
+            label="Competencias"
+            value={registrations.length}
+            icon={Trophy}
+          />
+          <StatCard
+            label="Próximas"
+            value={upcoming.length}
+            icon={Calendar}
+          />
+          <StatCard
+            label="Finalizadas"
+            value={finished.length}
+            icon={CheckCircle2}
+          />
+        </div>
+      )}
 
       {/* Upcoming */}
       {upcoming.length > 0 && (

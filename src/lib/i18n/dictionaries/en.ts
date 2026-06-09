@@ -6,7 +6,7 @@ export const dictionary = {
     faq: "FAQ",
     signIn: "Sign in",
     getStarted: "Get Started",
-    dashboard: "Dashboard",
+    dashboard: "General Dashboard",
   },
   hero: {
     badge: "Now live — Box Battle 2026",
@@ -240,10 +240,10 @@ export const dictionary = {
   },
   dashboard: {
     sidebar: {
-      dashboard: "Dashboard",
+      dashboard: "General Dashboard",
       competitions: "Competitions",
-      newCompetition: "New Competition",
-      settings: "Settings",
+      newCompetition: "Create Competition",
+      settings: "Profile",
       signOut: "Sign out",
     },
     header: {
@@ -255,7 +255,7 @@ export const dictionary = {
       back: "Back",
     },
     home: {
-      title: "Dashboard",
+      title: "General Dashboard",
       welcome: "Welcome back, {name}",
       stats: {
         totalCompetitions: "Total Competitions",
@@ -288,7 +288,7 @@ export const dictionary = {
       },
     },
     competitions: {
-      title: "Competitions",
+      title: "My Competitions",
       description: "Manage all your competitions from one place.",
       newButton: "New Competition",
       empty: {

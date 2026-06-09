@@ -62,14 +62,7 @@ function LoginForm() {
         router.push(callbackUrl);
         return;
       }
-      // Get user role to redirect correctly
-      const meRes = await fetch("/api/user/me");
-      const meData = await meRes.json();
-      if (meData.user?.role === "ATHLETE") {
-        router.push("/athlete/dashboard");
-      } else {
-        router.push("/dashboard");
-      }
+      router.push("/dashboard");
     }
   }
 
@@ -181,7 +174,7 @@ function LoginForm() {
         <p className="mt-6 text-center text-sm text-text-secondary">
           ¿No tenés cuenta?{" "}
           <Link
-            href="/register?role=athlete"
+            href="/register"
             className="font-medium text-white hover:text-[#ff4d00] transition-colors"
           >
             Crear cuenta gratis
